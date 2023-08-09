@@ -1,0 +1,33 @@
+html,
+body {
+    font-size: 1rem;
+    font-family: 'Trebuchet MS', Verdana, Arial, Helvetica, sans-serif;
+    color: #374151;
+    line-height: 1.5;
+    background: #e0eff2;
+}
+.required {
+    color: #000000;
+    background-color: #f6f6d7;
+    border-bottom: 1px solid #f6f6d7;
+    border-right: 1px solid #f6f6d7;
+}
+#loader {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    width: 100px;
+    padding: 10px 10px 10px 10px;
+    background: #FFF6BF;
+    color: black;
+    border: 2px solid #FFF6BF;
+
+    position: fixed;
+    z-index: 5000;
+    top: 10;
+}
+.btn-dark{
+    background-color: #343b45;
+}

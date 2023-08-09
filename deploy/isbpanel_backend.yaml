@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: isbpanel-backend-mono
+  name: isbpanel-backend-mono
+  namespace: sdsb4d
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: isbpanel-backend-mono
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: isbpanel-backend-mono
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: isbpanel-backend-mono
+          image: asia.gcr.io/dazzling-pillar-328210/bitbucket.org/isbtotogroup/isbpanel_backend:latest
+          resources:
+            limits:
+              cpu: 100m
+              ephemeral-storage: 100Mi
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 100Mi
+              memory: 512Mi
+          env:
+            - name: DB_DRIVER
+              value: postgres
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: prod-db-credentials
+                  key: pg-host
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: prod-db-credentials
+                  key: pg-user
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: prod-db-credentials
+                  key: pg-pass
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: prod-db-credentials
+                  key: pg-dbname
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_REDIS_HOST
+              value: isbpanel-backend-redis-service
+            - name: DB_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: prod-db-credentials
+                  key: redis-pass
+            - name: DB_REDIS_PORT
+              value: '6379'
+            - name: DB_REDIS_NAME
+              value: '0'
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: prod-db-credentials
+                  key: jwt-isbpanel
+            - name: JWT_SECRET_KEY_EXPIRE_MINUTES_COUNT
+              value: '1440'
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  labels:
+    app: isbpanel-backend-mono
+  name: isbpanel-backend-mono
+  namespace: sdsb4d
+spec:
+  targetRef:
+    apiVersion: 'apps/v1'
+    kind: Deployment
+    name: isbpanel-backend-mono
+  updatePolicy:
+    updateMode: 'Auto'
