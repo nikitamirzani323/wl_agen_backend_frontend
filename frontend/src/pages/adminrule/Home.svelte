@@ -47,14 +47,17 @@
     const RefreshHalaman = () => {
         dispatch("handleRefreshData", "call");
     };
-    const EditData = (e, f) => {
+    const EditData = (idadmin, nama, rule) => {
         const adminrule = {
-            e,
-            f,
+            idadmin,
+            nama,
+            rule,
         };
         dispatch("handleEditData", adminrule);
     };
     async function handleSave(name) {
+        let temp_name = name.toLowerCase()
+        let temp_name2 = temp_name.replace(/\s/g, '')
         const res = await fetch("/api/saveadminrule", {
             method: "POST",
             headers: {
@@ -64,8 +67,9 @@
             body: JSON.stringify({
                 sdata: sData,
                 page: "ADMINRULE-SAVE",
-                adminrule_idadmin: name,
-                adminrule_rule: "",
+                agenadminrule_id: 0,
+                agenadminrule_name: temp_name2,
+                agenadminrule_rule: "",
             }),
         });
         const json = await res.json();
@@ -108,6 +112,18 @@
                 break;
         }
     }
+    function lowerCase(element) {
+        function onInput(event) {
+            element.value = element.value.toLowerCase();
+            element.value = element.value.replace(/\s/g, '');
+        }
+        element.addEventListener("input", onInput);
+        return {
+            destroy() {
+                element.removeEventListener("input", onInput);
+            },
+        };
+    }
 </script>
 
 <div id="loader" style="margin-left:50%;{css_loader}">
@@ -120,14 +136,12 @@
                 on:click={callFunction}
                 button_function="NEW"
                 button_title="New"
-                button_css="btn-dark"
-            />
+                button_css="btn-dark"/>
             <Button
                 on:click={callFunction}
                 button_function="REFRESH"
                 button_title="Refresh"
-                button_css="btn-primary"
-            />
+                button_css="btn-primary"/>
             <Panel card_title={title_page} card_footer={totalrecord}>
                 <slot:template slot="card-body">
                     <table class="table table-striped ">
@@ -135,7 +149,9 @@
                             <tr>
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;">&nbsp;</th>
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">NO</th>
-                                <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">RULE</th>
+                                <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">NAME</th>
+                                <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">CREATE</th>
+                                <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">UPDATE</th>
                             </tr>
                         </thead>
                         {#if totalrecord > 0}
@@ -148,12 +164,15 @@
                                             <i on:click={() => {
                                                     EditData(
                                                         rec.adminrule_idadmin,
+                                                        rec.adminrule_nama,
                                                         rec.adminrule_rule
                                                     );
                                                 }} class="bi bi-pencil"/>
                                         </td>
                                         <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.adminrule_no}</td>
-                                        <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.adminrule_idadmin}</td>
+                                        <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.adminrule_nama}</td>
+                                        <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.adminrule_create}</td>
+                                        <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.adminrule_update}</td>
                                     </tr>
                                 {/each}
                             </tbody>
@@ -186,14 +205,14 @@
         <div class="mb-3">
             <label for="exampleForm" class="form-label">Name</label>
             <input
+                use:lowerCase
                 on:change={handleChange}
                 bind:value={$form.name}
                 invalid={$errors.name.length > 0}
                 type="text"
                 class="form-control required"
                 placeholder="Name"
-                aria-label="Name"
-            />
+                aria-label="Name"/>
         </div>
     </slot:template>
     <slot:template slot="footer">

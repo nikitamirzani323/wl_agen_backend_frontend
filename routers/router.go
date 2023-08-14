@@ -52,7 +52,6 @@ func Init() *fiber.App {
 	app.Post("/api/login", controllers.CheckLogin)
 	app.Post("/api/valid", controllers.Home)
 	app.Post("/api/alladmin", controllers.Adminhome)
-	app.Post("/api/detailadmin", controllers.AdminDetail)
 	app.Post("/api/saveadmin", controllers.AdminSave)
 
 	app.Post("/api/alladminrule", controllers.Adminrulehome)

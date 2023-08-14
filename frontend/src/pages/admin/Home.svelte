@@ -1,164 +1,190 @@
 <script>
+    import { Input } from "sveltestrap";
+    
     import Panel from "../../components/Panel.svelte";
     import Loader from "../../components/Loader.svelte";
 	import Button from "../../components/Button.svelte";
 	import Modal from "../../components/Modal.svelte";
     import { createEventDispatcher } from "svelte";
-    import { createForm } from "svelte-forms-lib";
-    import * as yup from "yup";
 
-	export let table_header_font
-	export let table_body_font
-	export let token
-	export let listAdmin = []
-	export let listAdminrule = []
+    
+	export let table_header_font = ""
+	export let table_body_font = ""
+	export let token = ""
+	export let listHome = []
 	export let totalrecord = 0
     let dispatch = createEventDispatcher();
-	let title_page = "Admin"
+	let title_page = "ADMIN"
     let sData = "";
-    let username_flag = false;
-    let myModal_newentry = ""
+    let myModal_newentry = "";
+    let name_field = "";
+    let status_field = "N";
+    let create_field = "";
+    let update_field = "";
+    let flag_btnsave = true;
+    let idrecord = "";
+    let searchHome = "";
+    let filterHome = [];
     let css_loader = "display: none;";
     let msgloader = "";
-    let schema  = "";
     
-    if(sData == "New"){
-        schema = yup.object().shape({
-            username: yup.string().required("The Username is required").
-                        matches(/^[a-zA-z0-9]+$/, "Username must Character A-Z or a-z or 1-9 ").
-                        min(3,"The Username minimal 3 Character").
-                        max(30,"The Username mmaximal 30 Character"),
-            password: yup.string().required("The Password is required").
-                        min(4,"The Password minimal 3 Character").
-                        max(30,"The Password mmaximal 30 Character"),
-            rule: yup.string().required("The Rule is required"),
-            name: yup.string().required("The Name is required").
-                        matches(/^[a-zA-z0-9 ]+$/, "Name must Character A-Z or a-z or 1-9 ").
-                        min(3,"The Name minimal 3 Character").
-                        max(30,"The Name mmaximal 30 Character"),
-            status: yup.string(),
-        });
-    }else if(sData == "Edit"){
-        schema = yup.object().shape({
-            username: yup.string(),
-            password: yup.string().
-                        max(30,"The Password mmaximal 30 Character"),
-            rule: yup.string().required("The Rule is required"),
-            name: yup.string().required("The Name is required").
-                        matches(/^[a-zA-z0-9 ]+$/, "Name must Character A-Z or a-z or 1-9 ").
-                        min(3,"The Name minimal 3 Character").
-                        max(30,"The Name mmaximal 30 Character"),
-            status: yup.string(),
-        });
+    $: {
+        
+        if (searchHome) {
+            filterHome = listHome.filter(
+                (item) =>
+                    item.home_username
+                        .toLowerCase()
+                        .includes(searchHome.toLowerCase())
+            );
+        } else {
+            filterHome = [...listHome];
+        }
     }
     
-    const { form, errors, handleChange, handleSubmit } = createForm({
-        initialValues: {
-            username: "",
-            password: "",
-            rule:"",
-            name:"",
-            status:"Y"
-        },
-        validationSchema: schema,
-        onSubmit:(values) => {
-            handleSave(values.username,values.password,values.rule,values.name,values.status)
-        }
-    })
-    const NewData = (e,username,pass,rule,name,status) => {
+    const NewData = (e,id,nmcatebank,statuscatebank,create,update) => {
         sData = e
         if(sData == "New"){
             clearField()
         }else{
-            username_flag = true
-            $form.username = username
-            $form.password = pass
-            $form.rule = rule
-            $form.name = name
-            if(status == "ACTIVE"){
-                status = "Y"
-            }else{
-                status = "N"
-            }
-            $form.status = status
+            idrecord = parseInt(id)
+            name_field = nmcatebank;
+            status_field = statuscatebank;
+            create_field = create;
+            update_field = update;
         }
-        myModal_newentry = new bootstrap.Modal(document.getElementById("modalentry"));
+        myModal_newentry = new bootstrap.Modal(document.getElementById("modalentrycrud"));
         myModal_newentry.show();
         
     };
+  
     const RefreshHalaman = () => {
         dispatch("handleRefreshData", "call");
     };
-    async function handleSave(username,password,rule,name,status) {
-        const res = await fetch("/api/saveadmin", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token,
-            },
-            body: JSON.stringify({
-                sdata: sData,
-                page:"ADMIN-SAVE",
-                admin_rule: rule,
-                admin_username: username,
-                admin_password: password,
-                admin_nama: name,
-                admin_status: status,
-            }),
-        });
-        const json = await res.json();
-        if (json.status == 200) {
-            msgloader = json.message;
-            myModal_newentry.hide()
-            RefreshHalaman()
-        } else if(json.status == 403){
-            alert(json.message)
-        } else {
-            msgloader = json.message;
-        }
-        setTimeout(function () {
-            css_loader = "display: none;";
-        }, 1000);
-    }
-    function clearField(){
-        username_flag = false
-        $form.username = ""
-        $form.password = ""
-        $form.rule = ""
-        $form.name = ""
-        $form.status = "Y"
-    }
-    $:{
+    
+    
+    async function handleSave() {
+        let flag = true
+        let msg = ""
         if(sData == "New"){
-            if ($errors.username || $errors.password || $errors.rule || $errors.name || $errors.status){
-                alert($errors.username+"\n"+$errors.password+"\n"+$errors.rule+"\n"+$errors.name+"\n"+$errors.status)
-                $form.username = ""
-                $form.password = ""
-                $form.rule = ""
-                $form.name = ""
-                $form.status = "Y"
+            if(idrecord == ""){
+                flag = false
+                msg += "The ID is required\n"
+            }
+            if(idrecord.length == 4){
+                flag = false
+                msg += "The ID is maxlengt 4\n"
+            }
+            if(name_field == ""){
+                flag = false
+                msg += "The Name is required\n"
             }
         }else{
-            if ($errors.username || $errors.rule || $errors.name || $errors.status){
-                alert($errors.username+"\n"+$errors.rule+"\n"+$errors.name+"\n"+$errors.status)
-                $form.username = ""
-                $form.rule = ""
-                $form.name = ""
-                $form.status = "Y"
+            if(idrecord == ""){
+                flag = false
+                msg += "The ID is required\n"
+            }
+            if(name_field == ""){
+                flag = false
+                msg += "The Domain is required\n"
             }
         }
+        
+        if(flag){
+            flag_btnsave = false;
+            css_loader = "display: inline-block;";
+            msgloader = "Sending...";
+            const res = await fetch("/api/catebanksave", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                },
+                body: JSON.stringify({
+                    sdata: sData,
+                    page:"CATEBANK-SAVE",
+                    catebank_id: parseInt(idrecord),
+                    catebank_name: name_field,
+                    catebank_status: status_field,
+                }),
+            });
+            const json = await res.json();
+            if (json.status == 200) {
+                flag_btnsave = true;
+                if(sData=="New"){
+                    clearField()
+                }
+                msgloader = json.message;
+                RefreshHalaman()
+            } else if(json.status == 403){
+                flag_btnsave = true;
+                alert(json.message)
+            } else {
+                flag_btnsave = true;
+                msgloader = json.message;
+            }
+            setTimeout(function () {
+                css_loader = "display: none;";
+            }, 1000);
+        }else{
+            alert(msg)
+        }
+    }
+   
+    function clearField(){
+        idrecord = "";
+        name_field = "";
+        status_field = "N";
+        create_field = "";
+        update_field = "";
+        name_detail_field = "";
+        img_detail_field = "";
+        status_detail_field = "N";
+        create_detail_field = "";
+        update_detail_field = "";
     }
     
     function callFunction(event){
         switch(event.detail){
             case "NEW":
-                NewData("New","","","","","");
+                NewData("New","","","");
                 break;
             case "REFRESH":
                 RefreshHalaman();break;
             case "SAVE":
                 handleSubmit();break;
+            case "SAVEDETAIL":
+                handleDetailSave();break;
         }
+    }
+    const handleKeyboard_checkenter = (e) => {
+        let keyCode = e.which || e.keyCode;
+        if (keyCode === 13) {
+                filterTafsirMimpi = [];
+                listHome = [];
+                const tafsir = {
+                    searchTafsirMimpi,
+                };
+                dispatch("handleTafsirMimpi", tafsir);
+        }  
+    };
+    function uperCase(element) {
+        function onInput(event) {
+            element.value = element.value.toUpperCase();
+        }
+        element.addEventListener("input", onInput);
+        return {
+            destroy() {
+                element.removeEventListener("input", onInput);
+            },
+        };
+    }
+    function status(e){
+        let result = "DEACTIVE"
+        if(e == "Y"){
+            result = "ACTIVE"
+        }
+        return result
     }
 </script>
 <div id="loader" style="margin-left:50%;{css_loader}">
@@ -178,141 +204,119 @@
                 button_title="Refresh"
                 button_css="btn-primary"/>
             <Panel
+                card_search={true}
                 card_title="{title_page}"
                 card_footer={totalrecord}>
+                <slot:template slot="card-search">
+                    <div class="col-lg-12" style="padding: 5px;">
+                        <input
+                            bind:value={searchHome}
+                            on:keypress={handleKeyboard_checkenter}
+                            type="text"
+                            class="form-control"
+                            placeholder="Search Admin"
+                            aria-label="Search"/>
+                    </div>
+                </slot:template>
                 <slot:template slot="card-body">
-                        <table class="table table-striped ">
-                            <thead>
+                    <table class="table table-striped ">
+                        <thead>
+                            <tr>
+                                <th NOWRAP width="1%" style="text-align: center;vertical-align: top;">&nbsp;</th>
+                                <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">NO</th>
+                                <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">STATUS</th>
+                                <th NOWRAP width="1%" style="text-align: left;vertical-align: top;font-weight:bold;font-size:{table_header_font};">TIPE</th>
+                                <th NOWRAP width="1%" style="text-align: left;vertical-align: top;font-weight:bold;font-size:{table_header_font};">RULE</th>
+                                <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">USERNAME</th>
+                                <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">NAME</th>
+                                <th NOWRAP width="15%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">PHONE</th>
+                                <th NOWRAP width="15%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">LASTLOGIN</th>
+                                <th NOWRAP width="15%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">LASTIPADDRESS</th>
+                            </tr>
+                        </thead>
+                        {#if totalrecord > 0}
+                        <tbody>
+                            {#each filterHome as rec }
                                 <tr>
-                                    <th NOWRAP width="1%" style="text-align: center;vertical-align: top;">&nbsp;</th>
-                                    <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">&nbsp;</th>
-                                    <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">NO</th>
-                                    <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">USERNAME</th>
-                                    <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">NAME</th>
-                                    <th NOWRAP width="10%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">RULE</th>
-                                    <th NOWRAP width="10%" style="text-align: center;vertical-align: top;font-weight:bold;font-size: {table_header_font};">TIMEZONE</th>
-                                    <th NOWRAP width="10%" style="text-align: center;vertical-align: top;font-weight:bold;font-size: {table_header_font};">JOIN DATE</th>
-                                    <th NOWRAP width="10%" style="text-align: center;vertical-align: top;font-weight:bold;font-size: {table_header_font};">LAST LOGIN</th>
-                                    <th NOWRAP width="10%" style="text-align: center;vertical-align: top;font-weight:bold;font-size: {table_header_font};">LAST IPADDRESS</th>
-                                </tr>
-                            </thead>
-                            {#if totalrecord > 0}
-                            <tbody>
-                                {#each listAdmin as rec }
-                                    <tr>
-                                        <td NOWRAP style="text-align: center;vertical-align: top;cursor:pointer;">
-                                            <i 
-                                                on:click={() => {
-                                                    NewData("Edit",rec.admin_username,"",rec.admin_rule,rec.admin_nama,rec.admin_status);
-                                                }} 
-                                                class="bi bi-pencil"></i>
-                                        </td>
-                                        <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">
-                                            <span style="padding: 5px;border-radius: 10px;padding-right:10px;padding-left:10px;{rec.admin_statuscss}">
-                                                {rec.admin_status}
-                                            </span>
-                                        </td>
-                                        <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.admin_no}</td>
-                                        <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.admin_username}</td>
-                                        <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.admin_nama}</td>
-                                        <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.admin_rule}</td>
-                                        <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.admin_timezone}</td>
-                                        <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.admin_joindate}</td>
-                                        <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.admin_lastlogin}</td>
-                                        <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.admin_lastipaddres}</td>
-                                    </tr>
-                                {/each}
-                            </tbody>
-                            {:else}
-                            <tbody>
-                                <tr>
-                                    <td colspan="10">
-                                        <center>
-                                            <Loader />
-                                        </center>
+                                    <td NOWRAP style="text-align: center;vertical-align: top;cursor:pointer;">
+                                        <i on:click={() => {
+                                                NewData("Edit",rec.home_id, rec.home_name, rec.home_status, rec.home_create, rec.home_update);
+                                            }} class="bi bi-pencil"></i>
                                     </td>
+                                    <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.home_no}</td>
+                                    <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">
+                                        <span style="padding: 5px;border-radius: 10px;padding-right:10px;padding-left:10px;{rec.home_status_css}">
+                                            {status(rec.home_status)}
+                                        </span>
+                                    </td>
+                                    <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_tipe}</td>
+                                    <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_nmrule}</td>
+                                    <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_username}</td>
+                                    <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_nama}</td>
+                                    <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_phone1} / {rec.home_phone2}</td>
+                                    <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_lastlogin}</td>
+                                    <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_lastipaddress}</td>
                                 </tr>
-                            </tbody>
-                            {/if} 
-                        </table>
+                            {/each}
+                        </tbody>
+                        {:else}
+                        <tbody>
+                            <tr>
+                                <td colspan="20">
+                                    <center>
+                                        <Loader />
+                                    </center>
+                                </td>
+                            </tr>
+                        </tbody>
+                        {/if} 
+                    </table>
                 </slot:template>
             </Panel>
-
-            
         </div>
     </div>
 </div>
 
 <Modal
-	modal_id="modalentry"
+	modal_id="modalentrycrud"
 	modal_size="modal-dialog-centered"
 	modal_title="{title_page+"/"+sData}"
     modal_footer_css="padding:5px;"
 	modal_footer={true}>
 	<slot:template slot="body">
         <div class="mb-3">
-            <label for="exampleForm" class="form-label">Rule</label>
-			<select
-                on:change="{handleChange}"
-                bind:value={$form.rule} 
-                class="form-control required">
-                <option value="">--Select--</option>
-                {#each listAdminrule as rec }
-                    <option value="{rec.adminrule_idruleadmin}">{rec.adminrule_idruleadmin}</option>
-                {/each}
-            </select>
-		</div>
-		<div class="mb-3">
-            <label for="exampleForm" class="form-label">Username</label>
-            <input
-                on:change="{handleChange}"
-                bind:value={$form.username}
-                invalid={$errors.username.length > 0}
-                disabled='{username_flag}'
+            <label for="exampleForm" class="form-label">Category Bank</label>
+            <input bind:value={name_field}
+                use:uperCase
+                class="required form-control"
+                maxlength="70" 
                 type="text"
-                class="form-control required"
-                placeholder="Username"
-                aria-label="Username"/>
-        </div>
-        <div class="mb-3">
-            <label for="exampleForm" class="form-label">Password</label>
-            <input
-                on:change="{handleChange}"
-                bind:value={$form.password}
-                invalid={$errors.password.length > 0}
-                type="password"
-                class="form-control required"
-                placeholder="Password"
-                aria-label="Password"/>
-        </div>
-        <div class="mb-3">
-            <label for="exampleForm" class="form-label">Name</label>
-            <input
-                on:change="{handleChange}"
-                bind:value={$form.name}
-                invalid={$errors.name.length > 0}
-                type="text"
-                class="form-control required"
-                placeholder="Name"
-                aria-label="Name"/>
+                placeholder="Name"/>
         </div>
         <div class="mb-3">
             <label for="exampleForm" class="form-label">Status</label>
-            <select
-                class="form-control required"
-                on:change="{handleChange}"
-                bind:value={$form.status}
-                invalid={$errors.status.length > 0} >
-                <option value="Y">ACTIVE</option>
-                <option value="N">DEACTIVE</option>
+            <select class="form-control required" bind:value="{status_field}">
+                <option value="Y">Y</option>
+                <option value="N">N</option>
             </select>
         </div>
+        {#if sData != "New"}
+        <div class="mb-3">
+            <div class="alert alert-secondary" style="font-size: 11px; padding:10px;" role="alert">
+                Create : {create_field}<br />
+                Update : {update_field}
+            </div>
+        </div>
+        {/if}
 	</slot:template>
 	<slot:template slot="footer">
-        <Button
-            on:click={callFunction}
+        {#if flag_btnsave == true}
+        <Button on:click={() => {
+                handleSave();
+            }} 
             button_function="SAVE"
             button_title="Save"
             button_css="btn-warning"/>
+        {/if}
 	</slot:template>
 </Modal>

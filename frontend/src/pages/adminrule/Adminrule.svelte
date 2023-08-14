@@ -7,6 +7,7 @@
     let record = "";
     let totalrecord = 0;
     let adminrule_idadmin = "";
+    let adminrule_name = "";
     let adminrule_rule = "";
     export let table_header_font = "";
     export let table_body_font = "";
@@ -56,8 +57,11 @@
                         ...listAdminrule,
                         {
                             adminrule_no: no,
-                            adminrule_idadmin: record[i]["adminrule_idadmin"],
-                            adminrule_rule: record[i]["adminrule_rule"],
+                            adminrule_idadmin: record[i]["agenadminrule_id"],
+                            adminrule_nama: record[i]["agenadminrule_name"],
+                            adminrule_rule: record[i]["agenadminrule_rule"],
+                            adminrule_create: record[i]["agenadminrule_create"],
+                            adminrule_update: record[i]["agenadminrule_update"],
                         },
                     ];
                 }
@@ -78,8 +82,10 @@
         handleRefreshData("all");
     };
     const handleEditData = (e) => {
-        adminrule_idadmin = e.detail.e;
-        adminrule_rule = e.detail.f;
+        adminrule_idadmin = e.detail.idadmin;
+        adminrule_name = e.detail.nama;
+        adminrule_rule = e.detail.rule;
+
         sData = "Edit";
     };
     const handleRefreshData = (e) => {
@@ -111,6 +117,7 @@
             {table_header_font}
             {table_body_font}
             {adminrule_idadmin}
+            {adminrule_name}
             {adminrule_rule}
         />
     {/if}

@@ -6,12 +6,14 @@
     import * as yup from "yup";
     export let sData = "";
     export let token = "";
-    export let adminrule_idadmin = "";
+    export let adminrule_idadmin = 0;
+    export let adminrule_name = "";
     export let adminrule_rule = "";
     let adminrule_rule_field = adminrule_rule;
 
     let css_loader = "display: none;";
     let msgloader = "";
+    let flag_name = true
     let dispatch = createEventDispatcher();
     const schema = yup.object().shape({
         admin_name_field: yup
@@ -26,7 +28,7 @@
     });
     const { form, errors, handleChange, handleSubmit } = createForm({
         initialValues: {
-            admin_name_field: adminrule_idadmin,
+            admin_name_field: adminrule_name,
         },
         validationSchema: schema,
         onSubmit: (values) => {
@@ -43,6 +45,8 @@
         dispatch("handleBackHalaman", "call");
     };
     async function SaveTransaksi(name) {
+        let temp_name = name.toLowerCase()
+        let temp_name2 = temp_name.replace(/\s/g, '')
         const res = await fetch("/api/saveadminrule", {
             method: "POST",
             headers: {
@@ -52,8 +56,9 @@
             body: JSON.stringify({
                 sdata: sData,
                 page: "ADMINRULE-SAVE",
-                adminrule_idadmin: name,
-                adminrule_rule: adminrule_rule_field,
+                agenadminrule_id: parseInt(adminrule_idadmin),
+                agenadminrule_name: temp_name2,
+                agenadminrule_rule: adminrule_rule_field.toString(),
             }),
         });
         const json = await res.json();
@@ -78,6 +83,8 @@
             msg += "The List is required\n";
         }
         if (flag == false) {
+            let temp_name = adminrule_name.toLowerCase()
+            let temp_name2 = temp_name.replace(/\s/g, '')
             const res = await fetch("/api/saveadminrule", {
                 method: "POST",
                 headers: {
@@ -87,8 +94,9 @@
                 body: JSON.stringify({
                     sdata: sData,
                     page: "ADMINRULE-SAVE",
-                    adminrule_idadmin: adminrule_idadmin,
-                    adminrule_rule: adminrule_rule_field.toString(),
+                    agenadminrule_id: parseInt(adminrule_idadmin),
+                    agenadminrule_name: temp_name2,
+                    agenadminrule_rule: adminrule_rule_field.toString(),
                 }),
             });
             const json = await res.json();
@@ -118,6 +126,21 @@
                 handleSubmit();
                 break;
         }
+    }
+    function lowerCase(element) {
+        function onInput(event) {
+            element.value = element.value.toLowerCase();
+            element.value = element.value.replace(/\s/g, '');
+        }
+        element.addEventListener("input", onInput);
+        return {
+            destroy() {
+                element.removeEventListener("input", onInput);
+            },
+        };
+    }
+    if(adminrule_name == "master"){
+        flag_name = false;
     }
 </script>
 
@@ -154,7 +177,9 @@
                 <div class="card-body" style="height:400px;">
                     <div class="mb-3">
                         <label for="exampleForm" class="form-label">Name</label>
+                        {#if flag_name}
                         <input
+                            use:lowerCase 
                             on:change={handleChange}
                             bind:value={$form.admin_name_field}
                             invalid={$errors.admin_name_field.length > 0}
@@ -163,6 +188,18 @@
                             class="form-control"
                             placeholder="Name"
                             aria-label="Name"/>
+                        {:else}
+                        <input
+                            disabled
+                            on:change={handleChange}
+                            bind:value={$form.admin_name_field}
+                            invalid={$errors.admin_name_field.length > 0}
+                            type="text"
+                            maxlength="70"
+                            class="form-control"
+                            placeholder="Name"
+                            aria-label="Name"/>
+                        {/if}
                     </div>
                 </div>
             </div>

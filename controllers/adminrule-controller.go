@@ -68,10 +68,11 @@ func Adminrulehome(c *fiber.Ctx) error {
 }
 func AdminruleSave(c *fiber.Ctx) error {
 	type payload_adminrulesave struct {
-		Page    string `json:"page"`
-		Sdata   string `json:"sdata" `
-		Idadmin string `json:"adminrule_idadmin" `
-		Rule    string `json:"adminrule_rule" `
+		Page               string `json:"page"`
+		Sdata              string `json:"sdata" `
+		Agenadminrule_id   int    `json:"agenadminrule_id" `
+		Agenadminrule_name string `json:"agenadminrule_name" `
+		Agenadminrule_rule string `json:"agenadminrule_rule" `
 	}
 	hostname := c.Hostname()
 	bearToken := c.Get("Authorization")
@@ -95,11 +96,12 @@ func AdminruleSave(c *fiber.Ctx) error {
 		SetError(responseerror{}).
 		SetHeader("Content-Type", "application/json").
 		SetBody(map[string]interface{}{
-			"client_hostname":   hostname,
-			"page":              client.Page,
-			"sdata":             client.Sdata,
-			"adminrule_idadmin": client.Idadmin,
-			"adminrule_rule":    client.Rule,
+			"client_hostname":    hostname,
+			"page":               client.Page,
+			"sdata":              client.Sdata,
+			"agenadminrule_id":   client.Agenadminrule_id,
+			"agenadminrule_name": client.Agenadminrule_name,
+			"agenadminrule_rule": client.Agenadminrule_rule,
 		}).
 		Post(PATH + "api/saveadminrule")
 	if err != nil {
