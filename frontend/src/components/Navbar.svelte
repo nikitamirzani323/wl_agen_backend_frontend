@@ -37,13 +37,9 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li>
-                                <a class="dropdown-item" use:link href="/provider" style="font-size: 13px;">PROVIDER MANAGEMENT</a>
-                                <a class="dropdown-item" use:link href="/master" style="font-size: 13px;">MASTER MANAGEMENT</a>
-                                <a class="dropdown-item" use:link href="/categame" style="font-size: 13px;">CATEGORY GAME MANAGEMENT</a>
-                                <a class="dropdown-item" use:link href="/catebank" style="font-size: 13px;">CATEGORY BANK MANAGEMENT</a>
-                                <a class="dropdown-item" use:link href="/currency" style="font-size: 13px;">CURRENCY MANAGEMENT</a>
+                                <a class="dropdown-item" use:link href="/member" style="font-size: 13px;">MEMBER MANAGEMENT</a>
                                 <a class="dropdown-item" use:link href="/admin" style="font-size: 13px;">ADMIN MANAGEMENT</a>
-                                <a class="dropdown-item" use:link href="/adminrule" style="font-size: 13px;">ADMIN RULE</a>
+                                <a class="dropdown-item" use:link href="/adminrule" style="font-size: 13px;">ADMIN RULE MANAGEMENT</a>
                             </li>
                         </ul>
                     </li>

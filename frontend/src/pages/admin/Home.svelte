@@ -57,6 +57,10 @@
                 flag = false
                 msg += "The ID Rule is required\n"
             }
+            if(username_field == ""){
+                flag = false
+                msg += "The Username is required\n"
+            }
             if(name_field == ""){
                 flag = false
                 msg += "The Name is required\n"
@@ -73,6 +77,10 @@
             if(idrecord == ""){
                 flag = false
                 msg += "The ID is required\n"
+            }
+            if(username_field == ""){
+                flag = false
+                msg += "The Username is required\n"
             }
             if(idrule_field == ""){
                 flag = false
@@ -156,6 +164,13 @@
                 handleSave();break;
         }
     }
+    function status(e){
+        let result = "DEACTIVE"
+        if(e == "Y"){
+            result = "ACTIVE"
+        }
+        return result
+    }
 </script>
 <div id="loader" style="margin-left:50%;{css_loader}">
     {msgloader}
@@ -197,18 +212,18 @@
                                 {#each listAdmin as rec }
                                     <tr>
                                         <td NOWRAP style="text-align: center;vertical-align: top;cursor:pointer;">
-                                            <i 
-                                                on:click={() => {
+                                            {#if rec.home_tipe != "MASTER"}
+                                            <i on:click={() => {
                                                     //e,id,idrule,username,pass,name,phone1,phone2,status
                                                     NewData("Edit",rec.home_id,rec.home_idrule,rec.home_username,"",
                                                     rec.home_nama,rec.home_phone1,rec.home_phone2,
                                                     rec.home_status);
-                                                }} 
-                                                class="bi bi-pencil"></i>
+                                                }} class="bi bi-pencil"></i>
+                                            {/if}
                                         </td>
                                         <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">
                                             <span style="padding: 5px;border-radius: 10px;padding-right:10px;padding-left:10px;{rec.home_statuscss}">
-                                                {rec.home_status}
+                                                {status(rec.home_status)}
                                             </span>
                                         </td>
                                         <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.home_no}</td>
@@ -277,7 +292,7 @@
                     <input
                         bind:value={password_field}
                         type="password"
-                        class="form-control required"
+                        class="form-control "
                         placeholder="Password"
                         aria-label="Password"/>
                 </div>

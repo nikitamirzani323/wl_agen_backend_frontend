@@ -34,7 +34,7 @@
         }
     }
     async function initHome() {
-        const res = await fetch("/api/provider", {
+        const res = await fetch("/api/member", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -50,24 +50,24 @@
             if (record != null) {
                 totalrecord = record.length;
                 let no = 0
-                let domain_css = "";
                 for (var i = 0; i < record.length; i++) {
                     no = no + 1;
                     listHome = [
                         ...listHome,
                         {
                             home_no: no,
-                            home_id: record[i]["provider_id"],
-                            home_name: record[i]["provider_name"],
-                            home_owner: record[i]["provider_owner"],
-                            home_email: record[i]["provider_email"],
-                            home_phone1: record[i]["provider_phone1"],
-                            home_phone2: record[i]["provider_phone2"],
-                            home_urlwebsite: record[i]["provider_urlwebsite"],
-                            home_status: record[i]["provider_status"],
-                            home_status_css: record[i]["provider_status_css"],
-                            home_create: record[i]["provider_create"],
-                            home_update: record[i]["provider_update"],
+                            home_id: record[i]["member_id"],
+                            home_ipaddress: record[i]["member_ipaddress"],
+                            home_lastlogin: record[i]["member_lastlogin"],
+                            home_timezone: record[i]["member_timezone"],
+                            home_username: record[i]["member_username"],
+                            home_name: record[i]["member_name"],
+                            home_phone: record[i]["member_phone"],
+                            home_email: record[i]["member_email"],
+                            home_status: record[i]["member_status"],
+                            home_status_css: record[i]["member_status_css"],
+                            home_create: record[i]["member_create"],
+                            home_update: record[i]["member_update"],
                         },
                     ];
                 }

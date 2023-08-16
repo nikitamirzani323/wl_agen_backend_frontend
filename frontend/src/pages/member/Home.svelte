@@ -15,21 +15,20 @@
 	export let listHome = []
 	export let totalrecord = 0
     let dispatch = createEventDispatcher();
-	let title_page = "PROVIDER"
+	let title_page = "MEMBER"
     let sData = "";
     let myModal_newentry = "";
-    let flag_id_field = false;
     let flag_btnsave = true;
+    let username_flag = false;
+    let username_field = "";
+    let password_field = "";
     let name_field = "";
-    let owner_field = "";
     let email_field = "";
-    let phone1_field = "";
-    let phone2_field = "";
-    let urlwebsite_field = "";
+    let phone_field = "";
     let status_field = "";
     let create_field = "";
     let update_field = "";
-    let idrecord = 0;
+    let idrecord = "";
     let searchHome = "";
     let filterHome = [];
     let css_loader = "display: none;";
@@ -39,7 +38,10 @@
         if (searchHome) {
             filterHome = listHome.filter(
                 (item) =>
-                    item.home_name
+                    item.home_username
+                        .toLowerCase()
+                        .includes(searchHome.toLowerCase()) || 
+                    item.home_id
                         .toLowerCase()
                         .includes(searchHome.toLowerCase())
             );
@@ -48,20 +50,18 @@
         }
     }
     
-    const NewData = (e,id,nmprovider,ownerprovider,emailprovider,phone1provider,phone2provider,urlprovider,statusprovider,create,update) => {
+    const NewData = (e,id,username,name,email,phone,status,create,update) => {
         sData = e
         if(sData == "New"){
             clearField()
         }else{
-            flag_id_field = true;
+            username_flag = true;
             idrecord = id
-            name_field = nmprovider;
-            owner_field = ownerprovider;
-            email_field = emailprovider;
-            phone1_field = phone1provider;
-            phone2_field = phone2provider;
-            urlwebsite_field = urlprovider;
-            status_field = statusprovider;
+            username_field = username;
+            name_field = name;
+            email_field = email;
+            phone_field = phone;
+            status_field = status;
             create_field = create;
             update_field = update;
         }
@@ -78,17 +78,25 @@
         let flag = true
         let msg = ""
         if(sData == "New"){
+            if(username_field == ""){
+                flag = false
+                msg += "The Username is required\n"
+            }
+            if(username_field.length < 4){
+                flag = false
+                msg += "The Username is minglength 4\n"
+            }
+            if(password_field == ""){
+                flag = false
+                msg += "The Password is required\n"
+            }
             if(name_field == ""){
                 flag = false
                 msg += "The Name is required\n"
             }
-            if(owner_field == ""){
+            if(phone_field == ""){
                 flag = false
-                msg += "The Owner is required\n"
-            }
-            if(phone1_field == ""){
-                flag = false
-                msg += "The Phone 1 is required\n"
+                msg += "The Phone is required\n"
             }
             if(status_field == ""){
                 flag = false
@@ -99,17 +107,17 @@
                 flag = false
                 msg += "The ID is required\n"
             }
+            if(username_field == ""){
+                flag = false
+                msg += "The Username is required\n"
+            }
             if(name_field == ""){
                 flag = false
                 msg += "The Name is required\n"
             }
-            if(owner_field == ""){
+            if(phone_field == ""){
                 flag = false
-                msg += "The Owner is required\n"
-            }
-            if(phone1_field == ""){
-                flag = false
-                msg += "The Phone 1 is required\n"
+                msg += "The Phone is required\n"
             }
             if(status_field == ""){
                 flag = false
@@ -121,7 +129,7 @@
             flag_btnsave = false;
             css_loader = "display: inline-block;";
             msgloader = "Sending...";
-            const res = await fetch("/api/providersave", {
+            const res = await fetch("/api/membersave", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -130,14 +138,13 @@
                 body: JSON.stringify({
                     sdata: sData,
                     page:"PROVIDER-SAVE",
-                    provider_id: parseInt(idrecord),
-                    provider_name: name_field,
-                    provider_owner: owner_field,
-                    provider_email: email_field,
-                    provider_phone1: phone1_field,
-                    provider_phone2: phone2_field,
-                    provider_urlwebsite: urlwebsite_field,
-                    provider_status: status_field,
+                    member_id: idrecord,
+                    member_username: username_field,
+                    member_password: password_field,
+                    member_name: name_field,
+                    member_phone: phone_field,
+                    member_email: email_field,
+                    member_status: status_field,
                 }),
             });
             const json = await res.json();
@@ -164,14 +171,13 @@
     }
     
     function clearField(){
-        idrecord = 0;
-        flag_id_field = false
+        idrecord = "";
+        username_flag = false;
+        username_field = "";
+        password_field = "";
         name_field = "";
-        owner_field = "";
         email_field = "";
-        phone1_field = "";
-        phone2_field = "";
-        urlwebsite_field = "";
+        phone_field = "";
         status_field = "";
         create_field = "";
         update_field = "";
@@ -205,6 +211,18 @@
         }
         return result
     }
+    function lowerCase(element) {
+        function onInput(event) {
+            element.value = element.value.toLowerCase();
+            element.value = element.value.replace(/\s/g, '');
+        }
+        element.addEventListener("input", onInput);
+        return {
+            destroy() {
+                element.removeEventListener("input", onInput);
+            },
+        };
+    }
 </script>
 <div id="loader" style="margin-left:50%;{css_loader}">
     {msgloader}
@@ -228,12 +246,11 @@
                 card_footer={totalrecord}>
                 <slot:template slot="card-search">
                     <div class="col-lg-12" style="padding: 5px;">
-                        <input
-                            bind:value={searchHome}
+                        <input bind:value={searchHome}
                             on:keypress={handleKeyboard_checkenter}
                             type="text"
                             class="form-control"
-                            placeholder="Search Provider"
+                            placeholder="Search Member"
                             aria-label="Search"/>
                     </div>
                 </slot:template>
@@ -241,10 +258,12 @@
                     <table class="table table-striped ">
                         <thead>
                             <tr>
-                                <th NOWRAP width="1%" style="text-align: center;vertical-align: top;" >&nbsp;</th>
+                                <th NOWRAP width="1%" style="text-align: center;vertical-align: top;" colspan=2>&nbsp;</th>
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">NO</th>
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">STATUS</th>
-                                <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">PROVIDER</th>
+                                <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">CODE</th>
+                                <th NOWRAP width="10%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">USERNAME</th>
+                                <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">INFO</th>
                             </tr>
                         </thead>
                         {#if totalrecord > 0}
@@ -253,11 +272,19 @@
                                 <tr>
                                     <td NOWRAP style="text-align: center;vertical-align: top;cursor:pointer;">
                                         <i on:click={() => {
-                                                // e,id,nmprovider,ownerprovider,emailprovider,phone1provider,phone2provider,urlprovider,statusprovider,create,update
-                                                NewData("Edit",rec.home_id, rec.home_name, 
-                                                rec.home_owner, rec.home_email, rec.home_phone1, rec.home_phone2, rec.home_urlwebsite, rec.home_status, 
+                                                // e,id,username,name,email,phone,status,create,update
+                                                NewData("Edit",rec.home_id, rec.home_username, 
+                                                rec.home_name, rec.home_email, rec.home_phone, rec.home_status, 
                                                 rec.home_create, rec.home_update);
                                             }} class="bi bi-pencil"></i>
+                                    </td>
+                                    <td NOWRAP style="text-align: center;vertical-align: top;cursor:pointer;">
+                                        <i on:click={() => {
+                                                // e,id,username,name,email,phone,status,create,update
+                                                NewData("Edit",rec.home_id, rec.home_username, 
+                                                rec.home_name, rec.home_email, rec.home_phone, rec.home_status, 
+                                                rec.home_create, rec.home_update);
+                                            }} class="bi bi-database-add"></i>
                                     </td>
                                     <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.home_no}</td>
                                     <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">
@@ -265,13 +292,15 @@
                                             {status(rec.home_status)}
                                         </span>
                                     </td>
+                                    <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_id}</td>
+                                    <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_username}</td>
                                     <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">
-                                        <b>{rec.home_name}</b><br />
-                                        OWNER : {rec.home_owner}<br />
+                                        NAME : {rec.home_name}<br />
                                         EMAIL : {rec.home_email}<br />
-                                        PHONE : {rec.home_phone1} - {rec.home_phone2}<br />
-                                        WEBSITE : <a href="{rec.home_urlwebsite}" target="_blank">{rec.home_urlwebsite}</a>
-                                        <br />
+                                        PHONE : {rec.home_phone}<br />
+                                        LASTLOGIN : {rec.home_lastlogin}<br />
+                                        LASTIPADDRESS : {rec.home_ipaddress}<br />
+                                        LASTTIMEZONE : {rec.home_timezone}
                                     </td>
                                 </tr>
                             {/each}
@@ -304,6 +333,30 @@
         <div class="row">
             <div class="col-sm-6">
                 <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Username</label>
+                    <input 
+                        use:lowerCase
+                        bind:value={username_field} 
+                        disabled='{username_flag}'
+                        class="form-control required"
+                        minlength="4"
+                        maxlength="20"
+                        type="text"
+                        placeholder="Username"/>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Password</label>
+                    <input
+                        bind:value={password_field} 
+                        type="password"
+                        maxlength="30"
+                        class="form-control "
+                        placeholder="Password"
+                        aria-label="Password"/>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="mb-3">
                     <label for="exampleForm" class="form-label">Name</label>
                     <Input bind:value={name_field}
                         class="required"
@@ -311,41 +364,18 @@
                         placeholder="Name"/>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleForm" class="form-label">Owner</label>
-                    <Input bind:value={owner_field}
-                        class="required"
-                        type="text"
-                        placeholder="Owner"/>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="mb-3">
                     <label for="exampleForm" class="form-label">Email</label>
                     <Input bind:value={email_field}
-                        class="required"
+                        class=""
                         type="text"
                         placeholder="Email"/>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleForm" class="form-label">Phone 1</label>
-                    <Input bind:value={phone1_field}
+                    <label for="exampleForm" class="form-label">Phone</label>
+                    <Input bind:value={phone_field}
                         class="required"
                         type="text"
-                        placeholder="Phone 1"/>
-                </div>
-                <div class="mb-3">
-                    <label for="exampleForm" class="form-label">Phone 2</label>
-                    <Input bind:value={phone2_field}
-                        class="required"
-                        type="text"
-                        placeholder="Phone 2"/>
-                </div>
-                <div class="mb-3">
-                    <label for="exampleForm" class="form-label">URL Website</label>
-                    <Input bind:value={urlwebsite_field}
-                        class="required"
-                        type="text"
-                        placeholder="URL Website"/>
+                        placeholder="Phone"/>
                 </div>
                 <div class="mb-3">
                     <label for="exampleForm" class="form-label">Status</label>

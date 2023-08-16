@@ -158,16 +158,16 @@
                             <tbody>
                                 {#each listAdminrule as rec}
                                     <tr>
-                                        <td
-                                            NOWRAP
-                                            style="text-align: center;vertical-align: top;cursor:pointer;">
-                                            <i on:click={() => {
+                                        <td NOWRAP style="text-align: center;vertical-align: top;cursor:pointer;">
+                                            {#if rec.adminrule_nama != "master"}
+                                                <i on:click={() => {
                                                     EditData(
                                                         rec.adminrule_idadmin,
                                                         rec.adminrule_nama,
                                                         rec.adminrule_rule
                                                     );
                                                 }} class="bi bi-pencil"/>
+                                            {/if}
                                         </td>
                                         <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.adminrule_no}</td>
                                         <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.adminrule_nama}</td>

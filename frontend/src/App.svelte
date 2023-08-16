@@ -6,11 +6,7 @@
 	
 	import Admin from "./pages/admin/Admin.svelte";
 	import Adminrule from "./pages/adminrule/Adminrule.svelte";
-	import Provider from "./pages/provider/Provider.svelte";
-	import Currency from "./pages/currency/Currency.svelte";
-	import Catebank from "./pages/catebank/Catebank.svelte";
-	import Categame from "./pages/categame/Categame.svelte";
-	import Master from "./pages/master/Master.svelte";
+	import Member from "./pages/member/Member.svelte";
 	import Login from "./pages/Login.svelte";
 	import NotFound from "./pages/NotFound.svelte";
 	export let table_header_font;
@@ -35,42 +31,13 @@
 				},
 				component: Dashboard,
 			}),
-			"/categame": wrap({
-				component: Categame,
+			"/member": wrap({
+				component: Member,
 				props: {
 					table_header_font: table_header_font,
 					table_body_font: table_body_font,
 				},
 			}),
-			"/provider": wrap({
-				component: Provider,
-				props: {
-					table_header_font: table_header_font,
-					table_body_font: table_body_font,
-				},
-			}),
-			"/master": wrap({
-				component: Master,
-				props: {
-					table_header_font: table_header_font,
-					table_body_font: table_body_font,
-				},
-			}),
-			"/catebank": wrap({
-				component: Catebank,
-				props: {
-					table_header_font: table_header_font,
-					table_body_font: table_body_font,
-				},
-			}),
-			"/currency": wrap({
-				component: Currency,
-				props: {
-					table_header_font: table_header_font,
-					table_body_font: table_body_font,
-				},
-			}),
-			
 			"/admin": wrap({
 				component: Admin,
 				props: {
