@@ -8,6 +8,7 @@
     let token = localStorage.getItem("token");
     let akses_page = false;
     let listHome = [];
+    let listBank = [];
     let record = "";
     let record_message = "";
     let totalrecord = 0;
@@ -46,6 +47,7 @@
         const json = await res.json();
         if (json.status == 200) {
             record = json.record;
+            let record_bank = json.listbank;
             record_message = json.message;
             if (record != null) {
                 totalrecord = record.length;
@@ -64,6 +66,7 @@
                             home_name: record[i]["member_name"],
                             home_phone: record[i]["member_phone"],
                             home_email: record[i]["member_email"],
+                            home_listbank: record[i]["member_listbank"],
                             home_status: record[i]["member_status"],
                             home_status_css: record[i]["member_status_css"],
                             home_create: record[i]["member_create"],
@@ -71,6 +74,15 @@
                         },
                     ];
                 }
+            }
+            for (var i = 0; i < record_bank.length; i++) {
+                listBank = [
+                    ...listBank,
+                    {
+                        bank_category: record_bank[i]["catebank_name"],
+                        bank_id: record_bank[i]["banktype_id"],
+                    },
+                ];
             }
         } else {
             logout();
@@ -82,6 +94,7 @@
     }
     const handleRefreshData = (e) => {
         listHome = [];
+        listBank = [];
         totalrecord = 0;
         setTimeout(function () {
             initHome();
@@ -97,5 +110,6 @@
     {table_header_font}
     {table_body_font}
     {listHome}
+    {listBank}
     {totalrecord}/>
 {/if}
