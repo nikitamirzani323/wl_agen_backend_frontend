@@ -17,7 +17,6 @@
     let dispatch = createEventDispatcher();
 	let title_page = "BANK"
     let sData = "";
-    let sDataBank = "";
     let myModal_newentry = "";
     let flag_btnsave = true;
     let bank_id_field = "";
