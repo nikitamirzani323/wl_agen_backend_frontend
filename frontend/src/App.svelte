@@ -6,6 +6,7 @@
 	
 	import Admin from "./pages/admin/Admin.svelte";
 	import Adminrule from "./pages/adminrule/Adminrule.svelte";
+	import Bank from "./pages/bank/Bank.svelte";
 	import Member from "./pages/member/Member.svelte";
 	import Login from "./pages/Login.svelte";
 	import NotFound from "./pages/NotFound.svelte";
@@ -30,6 +31,13 @@
 					table_body_font: table_body_font,
 				},
 				component: Dashboard,
+			}),
+			"/bank": wrap({
+				component: Bank,
+				props: {
+					table_header_font: table_header_font,
+					table_body_font: table_body_font,
+				},
 			}),
 			"/member": wrap({
 				component: Member,

@@ -198,6 +198,7 @@
                                     <th NOWRAP width="1%" style="text-align: center;vertical-align: top;">&nbsp;</th>
                                     <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">&nbsp;</th>
                                     <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">NO</th>
+                                    <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">CODE</th>
                                     <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">TIPE</th>
                                     <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">RULE</th>
                                     <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">USERNAME</th>
@@ -227,6 +228,7 @@
                                             </span>
                                         </td>
                                         <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.home_no}</td>
+                                        <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_id}</td>
                                         <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_tipe}</td>
                                         <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_nmrule}</td>
                                         <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_username}</td>

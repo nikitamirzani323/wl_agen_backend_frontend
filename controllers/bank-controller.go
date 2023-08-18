@@ -10,7 +10,14 @@ import (
 	"github.com/nikitamirzani323/wl_super_backend_frontend/entities"
 )
 
-func Providerhome(c *fiber.Ctx) error {
+type responsebank struct {
+	Status   int         `json:"status"`
+	Message  string      `json:"message"`
+	Listbank interface{} `json:"listbank"`
+	Record   interface{} `json:"record"`
+}
+
+func Bankhome(c *fiber.Ctx) error {
 	hostname := c.Hostname()
 	bearToken := c.Get("Authorization")
 	token := strings.Split(bearToken, " ")
@@ -28,7 +35,7 @@ func Providerhome(c *fiber.Ctx) error {
 	render_page := time.Now()
 	axios := resty.New()
 	resp, err := axios.R().
-		SetResult(responsedefault{}).
+		SetResult(responsebank{}).
 		SetAuthToken(token[1]).
 		SetError(responseerror{}).
 		SetHeader("Content-Type", "application/json").
@@ -36,7 +43,7 @@ func Providerhome(c *fiber.Ctx) error {
 			"client_hostname": hostname,
 			"page":            client.Page,
 		}).
-		Post(PATH + "api/provider")
+		Post(PATH + "api/bank")
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -49,13 +56,14 @@ func Providerhome(c *fiber.Ctx) error {
 	log.Println("  Received At:", resp.ReceivedAt())
 	log.Println("  Body       :\n", resp)
 	log.Println()
-	result := resp.Result().(*responsedefault)
+	result := resp.Result().(*responsebank)
 	if result.Status == 200 {
 		return c.JSON(fiber.Map{
-			"status":  result.Status,
-			"message": result.Message,
-			"record":  result.Record,
-			"time":    time.Since(render_page).String(),
+			"status":   result.Status,
+			"message":  result.Message,
+			"record":   result.Record,
+			"listbank": result.Listbank,
+			"time":     time.Since(render_page).String(),
 		})
 	} else {
 		result_error := resp.Error().(*responseerror)
@@ -66,23 +74,21 @@ func Providerhome(c *fiber.Ctx) error {
 		})
 	}
 }
-func ProviderSave(c *fiber.Ctx) error {
-	type payload_providersave struct {
+func BankSave(c *fiber.Ctx) error {
+	type payload_banksave struct {
 		Page                string `json:"page"`
 		Sdata               string `json:"sdata" `
-		Provider_id         int    `json:"provider_id" `
-		Provider_name       string `json:"provider_name" `
-		Provider_owner      string `json:"provider_owner" `
-		Provider_email      string `json:"provider_email" `
-		Provider_phone1     string `json:"provider_phone1" `
-		Provider_phone2     string `json:"provider_phone2" `
-		Provider_urlwebsite string `json:"provider_urlwebsite" `
-		Provider_status     string `json:"provider_status" `
+		Agenbank_id         int    `json:"agenbank_id" `
+		Agenbank_tipe       string `json:"agenbank_tipe" `
+		Agenbank_idbanktype string `json:"agenbank_idbanktype" `
+		Agenbank_norek      string `json:"agenbank_norek" `
+		Agenbank_nmrek      string `json:"agenbank_nmrek" `
+		Agenbank_status     string `json:"agenbank_status" `
 	}
 	hostname := c.Hostname()
 	bearToken := c.Get("Authorization")
 	token := strings.Split(bearToken, " ")
-	client := new(payload_providersave)
+	client := new(payload_banksave)
 	if err := c.BodyParser(client); err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
@@ -104,16 +110,14 @@ func ProviderSave(c *fiber.Ctx) error {
 			"client_hostname":     hostname,
 			"page":                client.Page,
 			"sdata":               client.Sdata,
-			"provider_id":         client.Provider_id,
-			"provider_name":       client.Provider_name,
-			"provider_owner":      client.Provider_owner,
-			"provider_email":      client.Provider_email,
-			"provider_phone1":     client.Provider_phone1,
-			"provider_phone2":     client.Provider_phone2,
-			"provider_urlwebsite": client.Provider_urlwebsite,
-			"provider_status":     client.Provider_status,
+			"agenbank_id":         client.Agenbank_id,
+			"agenbank_tipe":       client.Agenbank_tipe,
+			"agenbank_idbanktype": client.Agenbank_idbanktype,
+			"agenbank_norek":      client.Agenbank_norek,
+			"agenbank_nmrek":      client.Agenbank_nmrek,
+			"agenbank_status":     client.Agenbank_status,
 		}).
-		Post(PATH + "api/providersave")
+		Post(PATH + "api/banksave")
 	if err != nil {
 		log.Println(err.Error())
 	}

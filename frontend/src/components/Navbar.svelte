@@ -38,6 +38,7 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li>
                                 <a class="dropdown-item" use:link href="/member" style="font-size: 13px;">MEMBER MANAGEMENT</a>
+                                <a class="dropdown-item" use:link href="/bank" style="font-size: 13px;">BANK MANAGEMENT</a>
                                 <a class="dropdown-item" use:link href="/admin" style="font-size: 13px;">ADMIN MANAGEMENT</a>
                                 <a class="dropdown-item" use:link href="/adminrule" style="font-size: 13px;">ADMIN RULE MANAGEMENT</a>
                             </li>
