@@ -75,6 +75,70 @@ func Memberhome(c *fiber.Ctx) error {
 		})
 	}
 }
+func Membersearch(c *fiber.Ctx) error {
+	type payload_membersearch struct {
+		Page          string `json:"page"`
+		Sdata         string `json:"sdata" `
+		Member_search string `json:"member_search"`
+	}
+	hostname := c.Hostname()
+	bearToken := c.Get("Authorization")
+	token := strings.Split(bearToken, " ")
+	client := new(payload_membersearch)
+	if err := c.BodyParser(client); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	log.Println("Hostname: ", hostname)
+	render_page := time.Now()
+	axios := resty.New()
+	resp, err := axios.R().
+		SetResult(responsemember{}).
+		SetAuthToken(token[1]).
+		SetError(responseerror{}).
+		SetHeader("Content-Type", "application/json").
+		SetBody(map[string]interface{}{
+			"client_hostname": hostname,
+			"page":            client.Page,
+			"sdata":           client.Sdata,
+			"search":          client.Member_search,
+		}).
+		Post(PATH + "api/membersearch")
+	if err != nil {
+		log.Println(err.Error())
+	}
+	fmt.Println("Response Info:")
+	fmt.Println("  Error      :", err)
+	fmt.Println("  Status Code:", resp.StatusCode())
+	fmt.Println("  Status     :", resp.Status())
+	fmt.Println("  Proto      :", resp.Proto())
+	fmt.Println("  Time       :", resp.Time())
+	fmt.Println("  Received At:", resp.ReceivedAt())
+	fmt.Println("  Body       :\n", resp)
+	fmt.Println()
+	result := resp.Result().(*responsemember)
+	if result.Status == 200 {
+		return c.JSON(fiber.Map{
+			"status":   result.Status,
+			"message":  result.Message,
+			"record":   result.Record,
+			"listbank": result.Listbank,
+			"time":     time.Since(render_page).String(),
+		})
+	} else {
+		result_error := resp.Error().(*responseerror)
+		return c.JSON(fiber.Map{
+			"status":  result_error.Status,
+			"message": result_error.Message,
+			"time":    time.Since(render_page).String(),
+		})
+	}
+}
 func MemberSave(c *fiber.Ctx) error {
 	type payload_membersave struct {
 		Page            string `json:"page"`

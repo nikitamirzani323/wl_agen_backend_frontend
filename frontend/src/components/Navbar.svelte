@@ -33,6 +33,20 @@
                             role="button"
                             data-bs-toggle="dropdown"
                             aria-expanded="false" style="font-size: 13px;">
+                            TRANSAKSI
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li>
+                                <a class="dropdown-item" use:link href="/transaksidepowd" style="font-size: 13px;">DEPOSIT WITHDRAW</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                            id="navbarDropdown"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false" style="font-size: 13px;">
                             MASTER
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">

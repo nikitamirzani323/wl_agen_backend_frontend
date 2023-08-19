@@ -6,6 +6,7 @@
 	
 	import Admin from "./pages/admin/Admin.svelte";
 	import Adminrule from "./pages/adminrule/Adminrule.svelte";
+	import Transaksidepowd from "./pages/transaksidepowd/Transaksidepowd.svelte";
 	import Bank from "./pages/bank/Bank.svelte";
 	import Member from "./pages/member/Member.svelte";
 	import Login from "./pages/Login.svelte";
@@ -31,6 +32,13 @@
 					table_body_font: table_body_font,
 				},
 				component: Dashboard,
+			}),
+			"/transaksidepowd": wrap({
+				component: Transaksidepowd,
+				props: {
+					table_header_font: table_header_font,
+					table_body_font: table_body_font,
+				},
 			}),
 			"/bank": wrap({
 				component: Bank,
