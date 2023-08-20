@@ -68,11 +68,17 @@ func Transdpwdhome(c *fiber.Ctx) error {
 }
 func TransdpwdSave(c *fiber.Ctx) error {
 	type payload_transdpwdsave struct {
-		Page            string `json:"page"`
-		Sdata           string `json:"sdata" `
-		Catebank_id     int    `json:"catebank_id" `
-		Catebank_name   string `json:"catebank_name" `
-		Catebank_status string `json:"catebank_status" `
+		Page                string  `json:"page"`
+		Sdata               string  `json:"sdata" `
+		Transdpwd_id        string  `json:"transdpwd_id" `
+		Transdpwd_tipedoc   string  `json:"transdpwd_tipedoc" `
+		Transdpwd_idmember  string  `json:"transdpwd_idmember" `
+		Transdpwd_bank_in   int     `json:"transdpwd_bank_in" `
+		Transdpwd_bank_out  int     `json:"transdpwd_bank_out" `
+		Transdpwd_amount    float32 `json:"transdpwd_amount" `
+		Transdpwd_ipaddress string  `json:"transdpwd_ipaddress" `
+		Transdpwd_note      string  `json:"transdpwd_note" `
+		Transdpwd_status    string  `json:"transdpwd_status" `
 	}
 	hostname := c.Hostname()
 	bearToken := c.Get("Authorization")
@@ -96,12 +102,18 @@ func TransdpwdSave(c *fiber.Ctx) error {
 		SetError(responseerror{}).
 		SetHeader("Content-Type", "application/json").
 		SetBody(map[string]interface{}{
-			"client_hostname": hostname,
-			"page":            client.Page,
-			"sdata":           client.Sdata,
-			"catebank_id":     client.Catebank_id,
-			"catebank_name":   client.Catebank_name,
-			"catebank_status": client.Catebank_status,
+			"client_hostname":     hostname,
+			"page":                client.Page,
+			"sdata":               client.Sdata,
+			"transdpwd_id":        client.Transdpwd_id,
+			"transdpwd_tipedoc":   client.Transdpwd_tipedoc,
+			"transdpwd_idmember":  client.Transdpwd_idmember,
+			"transdpwd_bank_in":   client.Transdpwd_bank_in,
+			"transdpwd_bank_out":  client.Transdpwd_bank_out,
+			"transdpwd_amount":    client.Transdpwd_amount,
+			"transdpwd_ipaddress": client.Transdpwd_ipaddress,
+			"transdpwd_note":      client.Transdpwd_note,
+			"transdpwd_status":    client.Transdpwd_status,
 		}).
 		Post(PATH + "api/transaksidepowdsave")
 	if err != nil {
