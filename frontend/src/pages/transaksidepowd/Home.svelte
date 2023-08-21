@@ -35,6 +35,7 @@
     let transaksi_temp_field = "";
     let transaksi_id_field = "";
     let transaksi_idmember_field = "";
+    let transaksi_nmmember_field = "";
     let transaksi_tipe_field = "";
     let transaksi_bankin_id_field = "";
     let transaksi_bankin_info_field = "";
@@ -179,18 +180,32 @@
                 break;
         }
     };
-    const NewDataTransaksi = (e,tipe,id,bank_in,bank_out,amount,note) => {
+    const NewDataTransaksi = (e,tipe,id,idmember,nmmember,bank_in,bank_out,bank_in_info,bank_out_info,amount,status,note,create,update) => {
         sData = e
         if(e=="New"){
             clearField()
             transaksi_tipe_field = tipe
             transaksi_status_field = "PROCESS"
+            myModal_newentry = new bootstrap.Modal(document.getElementById("modalentrycruddeposit"));
+            myModal_newentry.show();
         }else{
-            transaksi_tipe_field = tipe
-            transaksi_status_field = "PROCESS"
+            transaksi_id_field = id;
+            transaksi_idmember_field = idmember;
+            transaksi_nmmember_field = nmmember;
+            transaksi_tipe_field = tipe;
+            transaksi_bankin_id_field = bank_in;
+            transaksi_bankin_info_field = bank_in_info;
+            transaksi_bankout_id_field = bank_out;
+            transaksi_bankout_info_field = bank_out_info;
+            transaksi_amount_field = amount;
+            transaksi_note_field = note;
+            transaksi_status_field = status;
+            transaksi_create_field = create;
+            transaksi_update_field = update;
+            myModal_newentry = new bootstrap.Modal(document.getElementById("modalformdeposit"));
+            myModal_newentry.show();
         }
-        myModal_newentry = new bootstrap.Modal(document.getElementById("modalentrycruddeposit"));
-        myModal_newentry.show();
+        
         
     };
     const RefreshHalaman = () => {
@@ -472,8 +487,9 @@
                                 <th NOWRAP width="2%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">TIPE</th>
                                 <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">DOCUMENT</th>
                                 <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">MEMBER</th>
-                                <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">INFO</th>
-                                <th NOWRAP width="15%" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">AMOUNT</th>
+                                <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BANK OUT</th>
+                                <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BANK IN</th>
+                                <th NOWRAP width="*" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">AMOUNT</th>
                             </tr>
                         </thead>
                         {#if totalrecord > 0}
@@ -482,9 +498,11 @@
                                 <tr>
                                     <td NOWRAP style="text-align: center;vertical-align: top;cursor:pointer;">
                                         <i on:click={() => {
-                                                // e,id,idbank,tipe,norek,nmrek,status,create,update
-                                                NewData("Edit",rec.home_id,  rec.home_idbanktype, rec.home_tipe, 
-                                                rec.home_norek, rec.home_nmrek, rec.home_status, 
+                                                // e,tipe,id,idmember,bank_in,bank_out,bank_in_info,bank_out_info,amount,status,note,create,update
+                                                NewDataTransaksi("Edit",rec.home_tipedoc,
+                                                rec.home_id, rec.home_idmember, rec.home_nmmember,
+                                                rec.home_bank_in, rec.home_bank_out,rec.home_bank_in_info,rec.home_bank_out_info,
+                                                rec.home_amount, rec.home_status, rec.home_note,
                                                 rec.home_create, rec.home_update);
                                             }} class="bi bi-pencil"></i>
                                     </td>
@@ -496,8 +514,9 @@
                                     </td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_tipedoc}</td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_id}</td>
-                                    <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_idmember}</td>
-                                    <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_info}</td>
+                                    <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_nmmember}</td>
+                                    <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_bank_out_info}</td>
+                                    <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_bank_in_info}</td>
                                     <td NOWRAP style="text-align: right;vertical-align: top;font-size: {table_body_font};">{new Intl.NumberFormat().format(rec.home_amount)}</td>
                                 </tr>
                             {/each}
@@ -663,6 +682,92 @@
         {/if}
 	</slot:template>
 </Modal>
+
+
+<Modal
+	modal_id="modalformdeposit"
+	modal_size="modal-dialog-centered modal-lg"
+	modal_title="DOCUMENT : {transaksi_id_field}"
+    modal_footer_css="padding:5px;"
+	modal_footer={true}>
+	<slot:template slot="body">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Jenis Transaksi</label>
+                    <input class="form-control"
+                        type="text"
+                        value="{transaksi_tipe_field}"
+                        disabled
+                        placeholder="Jenis Transaksi"/>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Info Bank Out</label>
+                    <div class="alert alert-secondary" style="padding:10px;" role="alert">
+                       {transaksi_nmmember_field}<br />
+                       {transaksi_bankout_info_field}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Info Bank In</label>
+                    <div class="alert alert-secondary" style="padding:10px;" role="alert">
+                       {transaksi_bankout_info_field}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Amount</label>
+                    <Input
+                        on:keyup={handleKeyboard_number} 
+                        bind:value={transaksi_amount_field}
+                        class="required"
+                        style="text-align: right;"
+                        type="text"
+                        placeholder="Amount"/>
+                    <div id="passwordHelpBlock" class="form-text" style="text-align: right;font-size:11px;">
+                        {new Intl.NumberFormat().format(transaksi_amount_field)}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Note</label>
+                    <textarea
+                        bind:value={transaksi_note_field} 
+                        class="form-control" 
+                        style="resize: none;"
+                        placeholder="Note" id="floatingTextarea"></textarea>
+                </div>
+                {#if sData != "New"}
+                <div class="mb-3">
+                    <div class="alert alert-secondary" style="font-size: 11px; padding:10px;" role="alert">
+                        Create : {transaksi_create_field}<br />
+                        Update : {transaksi_update_field}
+                    </div>
+                </div>
+                {/if}
+            </div>
+        </div>
+        
+        
+	</slot:template>
+	<slot:template slot="footer">
+        {#if flag_btnsave}
+        <Button on:click={() => {
+                handleSaveTransaksi();
+            }} 
+            button_function="SAVE"
+            button_title="Approve"
+            button_css="btn-warning"/>
+        <Button on:click={() => {
+                handleSaveTransaksi();
+            }} 
+            button_function="SAVE"
+            button_title="Rejected"
+            button_css="btn-danger"/>
+        {/if}
+	</slot:template>
+</Modal>
+
 
 <Modal
     modal_id="modallistmember"
