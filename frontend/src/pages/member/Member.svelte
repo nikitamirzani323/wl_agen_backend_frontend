@@ -52,8 +52,14 @@
             if (record != null) {
                 totalrecord = record.length;
                 let no = 0
+                let credit_css = "";
                 for (var i = 0; i < record.length; i++) {
                     no = no + 1;
+                    if(parseInt(record[i]["member_credit"])>0){
+                        credit_css = "color:#3600ff;font-weight:bold;"
+                    }else{
+                        credit_css = "color:#ff0000;font-weight:bold;"
+                    }
                     listHome = [
                         ...listHome,
                         {
@@ -66,6 +72,8 @@
                             home_name: record[i]["member_name"],
                             home_phone: record[i]["member_phone"],
                             home_email: record[i]["member_email"],
+                            home_credit: record[i]["member_credit"],
+                            home_credit_css: credit_css,
                             home_listbank: record[i]["member_listbank"],
                             home_status: record[i]["member_status"],
                             home_status_css: record[i]["member_status_css"],

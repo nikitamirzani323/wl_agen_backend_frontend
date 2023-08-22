@@ -66,6 +66,7 @@ func Init() *fiber.App {
 	app.Post("/api/memberbankdelete", controllers.MemberBankDelete)
 	app.Post("/api/transdpwd", controllers.Transdpwdhome)
 	app.Post("/api/transdpwdsave", controllers.TransdpwdSave)
+	app.Post("/api/transdpwdupdate", controllers.TransdpwdUpdate)
 
 	return app
 }

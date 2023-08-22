@@ -423,6 +423,7 @@
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">NO</th>
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">STATUS</th>
                                 <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">CODE</th>
+                                <th NOWRAP width="10%" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">CREDIT</th>
                                 <th NOWRAP width="10%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">USERNAME</th>
                                 <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">INFO</th>
                                 <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BANK</th>
@@ -453,6 +454,7 @@
                                         </span>
                                     </td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_id}</td>
+                                    <td NOWRAP style="text-align: right;vertical-align: top;font-size: {table_body_font};{rec.home_credit_css}">{new Intl.NumberFormat().format(rec.home_credit)}</td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_username}</td>
                                     <td  style="text-align: left;vertical-align: top;font-size: {table_body_font};">
                                         NAME : {rec.home_name}<br />

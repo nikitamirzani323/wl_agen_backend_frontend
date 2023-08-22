@@ -32,6 +32,7 @@
     let agenbank_id_field = "";
     let agenbank_info_field = "";
     
+    let temp_credit_member = 0;
     let transaksi_temp_field = "";
     let transaksi_id_field = "";
     let transaksi_idmember_field = "";
@@ -56,10 +57,10 @@
         if (searchHome) {
             filterHome = listHome.filter(
                 (item) =>
-                    item.home_idbanktype
+                    item.home_id
                         .toLowerCase()
                         .includes(searchHome.toLowerCase()) || 
-                    item.home_nmrek
+                    item.home_nmmember
                         .toLowerCase()
                         .includes(searchHome.toLowerCase())
             );
@@ -134,7 +135,7 @@
         }
         
     };
-    const InsertInOut = (id,info,listbank) => {
+    const InsertInOut = (id,info,listbank,credit) => {
         switch(transaksi_tipe_field){
             case "DEPOSIT":
                 if(transaksi_temp_field == "IN"){
@@ -158,6 +159,7 @@
                 }
                 break;
             case "WITHDRAW":
+                temp_credit_member = credit
                 if(transaksi_temp_field == "OUT"){
                     transaksi_bankout_id_field = id
                     transaksi_bankout_info_field = info
@@ -179,6 +181,7 @@
                 }
                 break;
         }
+        myModal_newentry.hide();
     };
     const NewDataTransaksi = (e,tipe,id,idmember,nmmember,bank_in,bank_out,bank_in_info,bank_out_info,amount,status,note,create,update) => {
         sData = e
@@ -269,6 +272,7 @@
                             member_no: no,
                             member_id: record[i]["member_id"],
                             member_name: record[i]["member_name"],
+                            member_credit: record[i]["member_credit"],
                             member_listbank: record[i]["member_listbank"],
                         },
                     ];
@@ -327,7 +331,12 @@
                 msg += "The Amount is required\n"
             }
         }
-        
+        if(transaksi_tipe_field == "WITHDRAW"){
+            if(parseInt(temp_credit_member) < parseInt(transaksi_amount_field)){
+                flag = false
+                msg += "The Amount exceed Credit Member\n"
+            }
+        }
         if(flag){
             flag_btnsave = false;
             css_loader = "display: inline-block;";
@@ -360,6 +369,7 @@
                 }
                 msgloader = json.message;
                 RefreshHalaman()
+                myModal_newentry.hide();
             } else if(json.status == 403){
                 flag_btnsave = true;
                 alert(json.message)
@@ -374,9 +384,67 @@
             alert(msg)
         }
     }
-   
+    async function handleUpdateTransaksi(e) {
+        let flag = true
+        let msg = ""
+        if(transaksi_id_field == ""){
+            flag = false
+            msg += "The Document is required\n"
+        }
+        if(transaksi_idmember_field == ""){
+            flag = false
+            msg += "The Member is required\n"
+        }
+        if(e == "REJECTED"){
+            if(transaksi_note_field == ""){
+                flag = false
+                msg += "The Note is required\n"
+            }
+        }
+        
+        if(flag){
+            flag_btnsave = false;
+            css_loader = "display: inline-block;";
+            msgloader = "Sending...";
+            const res = await fetch("/api/transdpwdupdate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                },
+                body: JSON.stringify({
+                    sdata: sData,
+                    page:"PROVIDER-SAVE",
+                    transdpwd_id: transaksi_id_field,
+                    transdpwd_idmember: transaksi_idmember_field,
+                    transdpwd_note: transaksi_note_field,
+                    transdpwd_status: e,
+                }),
+            });
+            const json = await res.json();
+            if (json.status == 200) {
+                flag_btnsave = true;
+                
+                msgloader = json.message;
+                myModal_newentry.hide();
+                RefreshHalaman()
+            } else if(json.status == 403){
+                flag_btnsave = true;
+                alert(json.message)
+            } else {
+                flag_btnsave = true;
+                msgloader = json.message;
+            }
+            setTimeout(function () {
+                css_loader = "display: none;";
+            }, 1000);
+        }else{
+            alert(msg)
+        }
+    }
     function clearField(){
         idrecord = "";
+        temp_credit_member = 0;
         transaksi_temp_field = "";
         transaksi_id_field = "";
         transaksi_idmember_field = "";
@@ -486,10 +554,13 @@
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">STATUS</th>
                                 <th NOWRAP width="2%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">TIPE</th>
                                 <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">DOCUMENT</th>
-                                <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">MEMBER</th>
+                                <th NOWRAP width="5%" style="text-align: center;vertical-align: top;font-weight:bold;font-size: {table_header_font};">DATE</th>
+                                <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">MEMBER</th>
                                 <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BANK OUT</th>
                                 <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BANK IN</th>
-                                <th NOWRAP width="*" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">AMOUNT</th>
+                                <th NOWRAP width="15%" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">AMOUNT</th>
+                                <th NOWRAP width="15%" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BEFORE</th>
+                                <th NOWRAP width="15%" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">AFTER</th>
                             </tr>
                         </thead>
                         {#if totalrecord > 0}
@@ -497,6 +568,7 @@
                             {#each filterHome as rec }
                                 <tr>
                                     <td NOWRAP style="text-align: center;vertical-align: top;cursor:pointer;">
+                                        {#if rec.home_status == "PROCESS"}
                                         <i on:click={() => {
                                                 // e,tipe,id,idmember,bank_in,bank_out,bank_in_info,bank_out_info,amount,status,note,create,update
                                                 NewDataTransaksi("Edit",rec.home_tipedoc,
@@ -505,6 +577,7 @@
                                                 rec.home_amount, rec.home_status, rec.home_note,
                                                 rec.home_create, rec.home_update);
                                             }} class="bi bi-pencil"></i>
+                                        {/if}
                                     </td>
                                     <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.home_no}</td>
                                     <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">
@@ -514,10 +587,13 @@
                                     </td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_tipedoc}</td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_id}</td>
+                                    <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.home_date}</td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_nmmember}</td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_bank_out_info}</td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_bank_in_info}</td>
-                                    <td NOWRAP style="text-align: right;vertical-align: top;font-size: {table_body_font};">{new Intl.NumberFormat().format(rec.home_amount)}</td>
+                                    <td NOWRAP style="text-align: right;vertical-align: top;font-size: {table_body_font};{rec.home_amount_css}">{new Intl.NumberFormat().format(rec.home_amount)}</td>
+                                    <td NOWRAP style="text-align: right;vertical-align: top;font-size: {table_body_font};color:#3600ff;font-weight:bold;">{new Intl.NumberFormat().format(rec.home_before)}</td>
+                                    <td NOWRAP style="text-align: right;vertical-align: top;font-size: {table_body_font};color:#3600ff;font-weight:bold;">{new Intl.NumberFormat().format(rec.home_after)}</td>
                                 </tr>
                             {/each}
                         </tbody>
@@ -753,13 +829,13 @@
 	<slot:template slot="footer">
         {#if flag_btnsave}
         <Button on:click={() => {
-                handleSaveTransaksi();
+                handleUpdateTransaksi("APPROVED");
             }} 
             button_function="SAVE"
             button_title="Approve"
             button_css="btn-warning"/>
         <Button on:click={() => {
-                handleSaveTransaksi();
+                handleUpdateTransaksi("REJECTED");
             }} 
             button_function="SAVE"
             button_title="Rejected"
@@ -793,15 +869,17 @@
                 <tr>
                     <th width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">NO</th>
                     <th width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size:{table_header_font};">MEMBER</th>
+                    <th width="15%" style="text-align: right;vertical-align: top;font-weight:bold;font-size:{table_header_font};">CREDIT</th>
                 </tr>
             </thead>
             <tbody>
             {#each filter_listmember as rec}
                 <tr on:click={() => {
-                        InsertInOut(rec.member_id, rec.member_name, rec.member_listbank);
+                        InsertInOut(rec.member_id, rec.member_name, rec.member_listbank, rec.member_credit);
                     }} style="cursor: pointer;">
                     <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.member_no}</td>
                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.member_name}</td>
+                    <td NOWRAP style="text-align: right;vertical-align: top;font-size: {table_body_font};color:#3600ff;font-weight:bold;">{new Intl.NumberFormat().format(rec.member_credit)}</td>
                 </tr>
             {/each}
             </tbody>
@@ -838,7 +916,7 @@
             <tbody>
             {#each filter_listagenbank as rec}
                 <tr on:click={() => {
-                        InsertInOut(rec.agenbank_id, rec.agenbank_info);
+                        InsertInOut(rec.agenbank_id, rec.agenbank_info,"",0);
                     }} style="cursor: pointer;">
                     <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.agenbank_no}</td>
                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.agenbank_info}</td>
