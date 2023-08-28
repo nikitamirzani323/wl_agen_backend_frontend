@@ -52,6 +52,7 @@
                 totalrecord = record.length;
                 let no = 0
                 let amount_css = "";
+                let tipeuserdoc_css = "";
                 for (var i = 0; i < record.length; i++) {
                     no = no + 1;
                     if(record[i]["transdpwd_tipedoc"] == "DEPOSIT"){
@@ -59,12 +60,19 @@
                     }else{
                         amount_css = "color:#ff0000;font-weight:bold;"
                     }
+                    if(record[i]["transdpwd_tipeuserdoc"] == "C"){
+                        tipeuserdoc_css = "background:#FFEB3B;font-weight:bold;color:black;"
+                    }else{
+                        tipeuserdoc_css = "background:#E91E63;font-weight:bold;color:white;"
+                    }
                     listHome = [
                         ...listHome,
                         {
                             home_no: no,
                             home_id: record[i]["transdpwd_id"],
                             home_tipedoc: record[i]["transdpwd_tipedoc"],
+                            home_tipeuserdoc: record[i]["transdpwd_tipeuserdoc"],
+                            home_tipeuserdoc_css: tipeuserdoc_css,
                             home_date: record[i]["transdpwd_date"],
                             home_info: record[i]["transdpwd_notebank"],
                             home_idmember: record[i]["transdpwd_idmember"],

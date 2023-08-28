@@ -205,8 +205,14 @@
             transaksi_status_field = status;
             transaksi_create_field = create;
             transaksi_update_field = update;
-            myModal_newentry = new bootstrap.Modal(document.getElementById("modalformdeposit"));
-            myModal_newentry.show();
+            if(tipe == "DEPOSIT"){
+                myModal_newentry = new bootstrap.Modal(document.getElementById("modalformdeposit"));
+                myModal_newentry.show();
+            }else{
+                myModal_newentry = new bootstrap.Modal(document.getElementById("modalformwithdraw"));
+                myModal_newentry.show();
+            }
+            
         }
         
         
@@ -553,11 +559,12 @@
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">NO</th>
                                 <th NOWRAP width="1%" style="text-align: center;vertical-align: top;font-weight:bold;font-size:{table_header_font};">STATUS</th>
                                 <th NOWRAP width="2%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">TIPE</th>
+                                <th NOWRAP width="2%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">&nbsp;</th>
                                 <th NOWRAP width="5%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">DOCUMENT</th>
                                 <th NOWRAP width="5%" style="text-align: center;vertical-align: top;font-weight:bold;font-size: {table_header_font};">DATE</th>
                                 <th NOWRAP width="*" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">MEMBER</th>
-                                <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BANK OUT</th>
-                                <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BANK IN</th>
+                                <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">FROM</th>
+                                <th NOWRAP width="25%" style="text-align: left;vertical-align: top;font-weight:bold;font-size: {table_header_font};">TO</th>
                                 <th NOWRAP width="15%" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">AMOUNT</th>
                                 <th NOWRAP width="15%" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">BEFORE</th>
                                 <th NOWRAP width="15%" style="text-align: right;vertical-align: top;font-weight:bold;font-size: {table_header_font};">AFTER</th>
@@ -586,6 +593,11 @@
                                         </span>
                                     </td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_tipedoc}</td>
+                                    <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">
+                                        <span style="padding: 5px;border-radius: 10px;padding-right:10px;padding-left:10px;{rec.home_tipeuserdoc_css}">
+                                            {rec.home_tipeuserdoc}
+                                        </span>
+                                    </td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_id}</td>
                                     <td NOWRAP style="text-align: center;vertical-align: top;font-size: {table_body_font};">{rec.home_date}</td>
                                     <td NOWRAP style="text-align: left;vertical-align: top;font-size: {table_body_font};">{rec.home_nmmember}</td>
@@ -634,7 +646,7 @@
                 </div>
                 {#if transaksi_tipe_field == "DEPOSIT"}
                     <div class="mb-3">
-                        <label for="exampleForm" class="form-label">Bank Out - Member</label>
+                        <label for="exampleForm" class="form-label">From - Member</label>
                         <div class="input-group mb-3">
                             <Input bind:value={transaksi_bankout_info_field}
                                 class="required"
@@ -647,7 +659,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="exampleForm" class="form-label">Bank Out</label>
+                        <label for="exampleForm" class="form-label">From</label>
                         <select
                             bind:value="{transaksi_bankout_id_field}" 
                             name="bankid" id="bankid" 
@@ -658,13 +670,13 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="exampleForm" class="form-label">Bank In - Agen</label>
+                        <label for="exampleForm" class="form-label">To - Agen</label>
                         <div class="input-group mb-3">
                             <Input bind:value={transaksi_bankin_info_field}
                                 class="required"
                                 type="text"
                                 disabled
-                                placeholder="Bank In"/>
+                                placeholder="Agen"/>
                             <button on:click={() => {
                                 ShowInOut("IN");
                                 }} class="btn btn-primary" type="button" id="button-addon2">...</button>
@@ -672,20 +684,20 @@
                     </div>
                 {:else}
                     <div class="mb-3">
-                        <label for="exampleForm" class="form-label">Bank Out - Agen</label>
+                        <label for="exampleForm" class="form-label">From - Agen</label>
                         <div class="input-group mb-3">
                             <Input bind:value={transaksi_bankout_info_field}
                                 class="required"
                                 type="text"
                                 disabled
-                                placeholder="Bank Out"/>
+                                placeholder="Agen"/>
                             <button on:click={() => {
                                 ShowInOut("OUT");
                                 }} class="btn btn-primary" type="button" id="button-addon2">...</button>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="exampleForm" class="form-label">Bank In - Member</label>
+                        <label for="exampleForm" class="form-label">To - Member</label>
                         <div class="input-group mb-3">
                             <Input bind:value={transaksi_bankin_info_field}
                                 class="required"
@@ -698,7 +710,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="exampleForm" class="form-label">Bank In</label>
+                        <label for="exampleForm" class="form-label">To</label>
                         <select
                             bind:value="{transaksi_bankin_id_field}" 
                             name="bankid" id="bankid" 
@@ -708,9 +720,7 @@
                             {/each}
                         </select>
                     </div>
-                    
                 {/if}
-                
             </div>
             <div class="col-sm-6">
                 <div class="mb-3">
@@ -778,14 +788,14 @@
                         placeholder="Jenis Transaksi"/>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleForm" class="form-label">Info Bank Out</label>
+                    <label for="exampleForm" class="form-label">From - Member</label>
                     <div class="alert alert-secondary" style="padding:10px;" role="alert">
                        {transaksi_nmmember_field}<br />
                        {transaksi_bankout_info_field}
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="exampleForm" class="form-label">Info Bank In</label>
+                    <label for="exampleForm" class="form-label">To - Agen</label>
                     <div class="alert alert-secondary" style="padding:10px;" role="alert">
                        {transaksi_bankout_info_field}
                     </div>
@@ -844,6 +854,91 @@
 	</slot:template>
 </Modal>
 
+<Modal
+	modal_id="modalformwithdraw"
+	modal_size="modal-dialog-centered modal-lg"
+	modal_title="DOCUMENT : {transaksi_id_field}"
+    modal_footer_css="padding:5px;"
+	modal_footer={true}>
+	<slot:template slot="body">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Jenis Transaksi</label>
+                    <input class="form-control"
+                        type="text"
+                        value="{transaksi_tipe_field}"
+                        disabled
+                        placeholder="Jenis Transaksi"/>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">From - Agen</label>
+                    <div class="input-group mb-3">
+                        <Input bind:value={transaksi_bankout_info_field}
+                            class="required"
+                            type="text"
+                            disabled
+                            placeholder="Agen"/>
+                        <button on:click={() => {
+                            ShowInOut("OUT");
+                            }} class="btn btn-primary" type="button" id="button-addon2">...</button>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">To - Member</label>
+                    <div class="alert alert-secondary" style="padding:10px;" role="alert">
+                        {transaksi_nmmember_field}<br />
+                        {transaksi_bankin_info_field}
+                     </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Amount</label>
+                    <Input
+                        on:keyup={handleKeyboard_number} 
+                        bind:value={transaksi_amount_field}
+                        class="required"
+                        style="text-align: right;"
+                        type="text"
+                        placeholder="Amount"/>
+                    <div id="passwordHelpBlock" class="form-text" style="text-align: right;font-size:11px;">
+                        {new Intl.NumberFormat().format(transaksi_amount_field)}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleForm" class="form-label">Note</label>
+                    <textarea
+                        bind:value={transaksi_note_field} 
+                        class="form-control" 
+                        style="resize: none;"
+                        placeholder="Note" id="floatingTextarea"></textarea>
+                </div>
+                {#if sData != "New"}
+                <div class="mb-3">
+                    <div class="alert alert-secondary" style="font-size: 11px; padding:10px;" role="alert">
+                        Create : {transaksi_create_field}<br />
+                        Update : {transaksi_update_field}
+                    </div>
+                </div>
+                {/if}
+            </div>
+        </div>
+        
+        
+	</slot:template>
+	<slot:template slot="footer">
+        {#if flag_btnsave}
+        <Button on:click={() => {
+                handleSaveTransaksi();
+            }} 
+            button_function="SAVE"
+            button_title="Save"
+            button_css="btn-warning"/>
+        {/if}
+	</slot:template>
+</Modal>
 
 <Modal
     modal_id="modallistmember"
