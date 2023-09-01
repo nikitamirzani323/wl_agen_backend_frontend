@@ -242,7 +242,7 @@
                 body: JSON.stringify({
                     sdata: sDataBank,
                     page:"PROVIDER-SAVE",
-                    memberbank_idagenmember: bank_idmember_field,
+                    memberbank_idmember: bank_idmember_field,
                     memberbank_idbanktype: bank_id_field,
                     memberbank_norek: bank_norek_field,
                     memberbank_nmownerbank: bank_name_field,

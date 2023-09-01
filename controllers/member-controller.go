@@ -216,13 +216,13 @@ func MemberSave(c *fiber.Ctx) error {
 }
 func MemberBankSave(c *fiber.Ctx) error {
 	type payload_memberbanksave struct {
-		Page                    string `json:"page"`
-		Sdata                   string `json:"sdata" `
-		Memberbank_idagenmember string `json:"memberbank_idagenmember" `
-		Memberbank_idbanktype   string `json:"memberbank_idbanktype" `
-		Memberbank_norek        string `json:"memberbank_norek" `
-		Memberbank_nmownerbank  string `json:"memberbank_nmownerbank" `
-		Memberbank_status       string `json:"memberbank_status" `
+		Page                   string `json:"page"`
+		Sdata                  string `json:"sdata" `
+		Memberbank_idmember    string `json:"memberbank_idmember" `
+		Memberbank_idbanktype  string `json:"memberbank_idbanktype" `
+		Memberbank_norek       string `json:"memberbank_norek" `
+		Memberbank_nmownerbank string `json:"memberbank_nmownerbank" `
+		Memberbank_status      string `json:"memberbank_status" `
 	}
 	hostname := c.Hostname()
 	bearToken := c.Get("Authorization")
@@ -246,14 +246,14 @@ func MemberBankSave(c *fiber.Ctx) error {
 		SetError(responseerror{}).
 		SetHeader("Content-Type", "application/json").
 		SetBody(map[string]interface{}{
-			"client_hostname":         hostname,
-			"page":                    client.Page,
-			"sdata":                   client.Sdata,
-			"memberbank_idagenmember": client.Memberbank_idagenmember,
-			"memberbank_idbanktype":   client.Memberbank_idbanktype,
-			"memberbank_norek":        client.Memberbank_norek,
-			"memberbank_nmownerbank":  client.Memberbank_nmownerbank,
-			"memberbank_status":       client.Memberbank_status,
+			"client_hostname":        hostname,
+			"page":                   client.Page,
+			"sdata":                  client.Sdata,
+			"memberbank_idmember":    client.Memberbank_idmember,
+			"memberbank_idbanktype":  client.Memberbank_idbanktype,
+			"memberbank_norek":       client.Memberbank_norek,
+			"memberbank_nmownerbank": client.Memberbank_nmownerbank,
+			"memberbank_status":      client.Memberbank_status,
 		}).
 		Post(PATH + "api/memberbanksave")
 	if err != nil {

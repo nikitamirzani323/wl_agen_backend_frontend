@@ -931,11 +931,17 @@
 	<slot:template slot="footer">
         {#if flag_btnsave}
         <Button on:click={() => {
-                handleSaveTransaksi();
+                handleUpdateTransaksi("APPROVED");
             }} 
             button_function="SAVE"
-            button_title="Save"
+            button_title="Approve"
             button_css="btn-warning"/>
+        <Button on:click={() => {
+                handleUpdateTransaksi("REJECTED");
+            }} 
+            button_function="SAVE"
+            button_title="Rejected"
+            button_css="btn-danger"/>
         {/if}
 	</slot:template>
 </Modal>
