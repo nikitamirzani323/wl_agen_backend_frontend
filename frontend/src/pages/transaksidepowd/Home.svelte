@@ -23,21 +23,19 @@
     let listmember = [];
     let member_listbank = [];
     let member_search = "";
-    let member_id_field = "";
-    let member_info_field = "";
 
     let filter_listagenbank = [];
     let listagenbank = [];
     let agenbank_search = "";
-    let agenbank_id_field = "";
-    let agenbank_info_field = "";
     
+    let temp_client_withdraw_step = 0;
     let temp_credit_member = 0;
     let transaksi_temp_field = "";
     let transaksi_id_field = "";
     let transaksi_idmember_field = "";
     let transaksi_nmmember_field = "";
     let transaksi_tipe_field = "";
+    let transaksi_tipeuser_field = "";
     let transaksi_bankin_id_field = "";
     let transaksi_bankin_info_field = "";
     let transaksi_bankout_id_field = "";
@@ -183,7 +181,7 @@
         }
         myModal_newentry.hide();
     };
-    const NewDataTransaksi = (e,tipe,id,idmember,nmmember,bank_in,bank_out,bank_in_info,bank_out_info,amount,status,note,create,update) => {
+    const NewDataTransaksi = (e,tipe,userdoc,id,idmember,nmmember,bank_in,bank_out,bank_in_info,bank_out_info,amount,status,note,create,update) => {
         sData = e
         if(e=="New"){
             clearField()
@@ -192,10 +190,12 @@
             myModal_newentry = new bootstrap.Modal(document.getElementById("modalentrycruddeposit"));
             myModal_newentry.show();
         }else{
+            idrecord = id
             transaksi_id_field = id;
             transaksi_idmember_field = idmember;
             transaksi_nmmember_field = nmmember;
             transaksi_tipe_field = tipe;
+            transaksi_tipeuser_field = userdoc
             transaksi_bankin_id_field = bank_in;
             transaksi_bankin_info_field = bank_in_info;
             transaksi_bankout_id_field = bank_out;
@@ -209,6 +209,9 @@
                 myModal_newentry = new bootstrap.Modal(document.getElementById("modalformdeposit"));
                 myModal_newentry.show();
             }else{
+                if(transaksi_tipeuser_field == "C"){
+                    temp_client_withdraw_step = 0
+                }
                 myModal_newentry = new bootstrap.Modal(document.getElementById("modalformwithdraw"));
                 myModal_newentry.show();
             }
@@ -338,6 +341,7 @@
             }
         }
         if(transaksi_tipe_field == "WITHDRAW"){
+            alert(temp_credit_member+" "+transaksi_amount_field)
             if(parseInt(temp_credit_member) < parseInt(transaksi_amount_field)){
                 flag = false
                 msg += "The Amount exceed Credit Member\n"
@@ -372,6 +376,10 @@
                 flag_btnsave = true;
                 if(sData=="New"){
                     clearField()
+                }else{
+                    if(transaksi_tipe_field == "WITHDRAW" && transaksi_tipeuser_field == "C"){
+                        temp_client_withdraw_step = 1;
+                    }
                 }
                 msgloader = json.message;
                 RefreshHalaman()
@@ -534,6 +542,11 @@
                 button_css="btn-dark"/>
             <Button
                 on:click={callFunction}
+                button_function="NEWBONUS"
+                button_title="Bonus"
+                button_css="btn-dark"/>
+            <Button
+                on:click={callFunction}
                 button_function="REFRESH"
                 button_title="Refresh"
                 button_css="btn-primary"/>
@@ -578,7 +591,7 @@
                                         {#if rec.home_status == "PROCESS"}
                                         <i on:click={() => {
                                                 // e,tipe,id,idmember,bank_in,bank_out,bank_in_info,bank_out_info,amount,status,note,create,update
-                                                NewDataTransaksi("Edit",rec.home_tipedoc,
+                                                NewDataTransaksi("Edit",rec.home_tipedoc,rec.home_tipeuserdoc,
                                                 rec.home_id, rec.home_idmember, rec.home_nmmember,
                                                 rec.home_bank_in, rec.home_bank_out,rec.home_bank_in_info,rec.home_bank_out_info,
                                                 rec.home_amount, rec.home_status, rec.home_note,
@@ -925,23 +938,50 @@
                 {/if}
             </div>
         </div>
-        
-        
 	</slot:template>
 	<slot:template slot="footer">
-        {#if flag_btnsave}
-        <Button on:click={() => {
-                handleUpdateTransaksi("APPROVED");
-            }} 
-            button_function="SAVE"
-            button_title="Approve"
-            button_css="btn-warning"/>
-        <Button on:click={() => {
-                handleUpdateTransaksi("REJECTED");
-            }} 
-            button_function="SAVE"
-            button_title="Rejected"
-            button_css="btn-danger"/>
+        {#if transaksi_tipeuser_field == "A"}
+            {#if flag_btnsave}
+                <Button on:click={() => {
+                        handleUpdateTransaksi("APPROVED");
+                    }} 
+                    button_function="SAVE"
+                    button_title="Approve"
+                    button_css="btn-warning"/>
+                <Button on:click={() => {
+                        handleUpdateTransaksi("REJECTED");
+                    }} 
+                    button_function="SAVE"
+                    button_title="Rejected"
+                    button_css="btn-danger"/>
+            {/if}
+        {/if}
+        {#if transaksi_tipeuser_field == "C"}
+            {#if parseInt(temp_client_withdraw_step) < 1}
+                {#if flag_btnsave}
+                    <Button on:click={() => {
+                            handleSaveTransaksi();
+                        }} 
+                        button_function="SAVE"
+                        button_title="Save"
+                        button_css="btn-warning"/>
+                {/if}
+            {:else}
+                {#if flag_btnsave}
+                    <Button on:click={() => {
+                            handleUpdateTransaksi("APPROVED");
+                        }} 
+                        button_function="SAVE"
+                        button_title="Approve"
+                        button_css="btn-warning"/>
+                    <Button on:click={() => {
+                            handleUpdateTransaksi("REJECTED");
+                        }} 
+                        button_function="SAVE"
+                        button_title="Rejected"
+                        button_css="btn-danger"/>
+                {/if}  
+            {/if}
         {/if}
 	</slot:template>
 </Modal>
