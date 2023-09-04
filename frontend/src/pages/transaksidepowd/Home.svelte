@@ -157,7 +157,9 @@
                 }
                 break;
             case "WITHDRAW":
-                temp_credit_member = credit
+                if(transaksi_tipeuser_field != "C"){
+                    temp_credit_member = credit
+                }
                 if(transaksi_temp_field == "OUT"){
                     transaksi_bankout_id_field = id
                     transaksi_bankout_info_field = info
@@ -190,6 +192,7 @@
             myModal_newentry = new bootstrap.Modal(document.getElementById("modalentrycruddeposit"));
             myModal_newentry.show();
         }else{
+            flag_btnsave = true;
             idrecord = id
             transaksi_id_field = id;
             transaksi_idmember_field = idmember;
@@ -211,6 +214,7 @@
             }else{
                 if(transaksi_tipeuser_field == "C"){
                     temp_client_withdraw_step = 0
+                    call_membercredit(idmember)
                 }
                 myModal_newentry = new bootstrap.Modal(document.getElementById("modalformwithdraw"));
                 myModal_newentry.show();
@@ -289,7 +293,27 @@
             }
         }
     }
-   
+    async function call_membercredit(idmember) {
+        temp_credit_member = 0;
+        const res = await fetch("/api/membercredit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                sdata: sData,
+                page:"PROVIDER-SAVE",
+                idmember: idmember,
+            }),
+        });
+        const json = await res.json();
+        if (json.status == 200) {
+            let member_credit = json.member_credit;
+            temp_credit_member = member_credit;
+            console.log(temp_credit_member)
+        }
+    }
     async function handleSaveTransaksi() {
         let flag = true
         let msg = ""
@@ -315,7 +339,7 @@
                 msg += "The Amount is required\n"
             }
         }else{
-            if(idrecord == ""){
+            if(idrecord == "" || idrecord == null){
                 flag = false
                 msg += "The ID is required\n"
             }
@@ -341,7 +365,6 @@
             }
         }
         if(transaksi_tipe_field == "WITHDRAW"){
-            alert(temp_credit_member+" "+transaksi_amount_field)
             if(parseInt(temp_credit_member) < parseInt(transaksi_amount_field)){
                 flag = false
                 msg += "The Amount exceed Credit Member\n"
@@ -360,7 +383,7 @@
                 body: JSON.stringify({
                     sdata: sData,
                     page:"PROVIDER-SAVE",
-                    transdpwd_id: parseInt(idrecord),
+                    transdpwd_id: idrecord,
                     transdpwd_tipedoc: transaksi_tipe_field,
                     transdpwd_idmember: transaksi_idmember_field,
                     transdpwd_bank_in: parseInt(transaksi_bankin_id_field),
@@ -374,14 +397,19 @@
             const json = await res.json();
             if (json.status == 200) {
                 flag_btnsave = true;
+                msgloader = json.message;
                 if(sData=="New"){
                     clearField()
                 }else{
-                    if(transaksi_tipe_field == "WITHDRAW" && transaksi_tipeuser_field == "C"){
-                        temp_client_withdraw_step = 1;
+                    if(msgloader == "Succes"){
+                        if(transaksi_tipe_field == "WITHDRAW" && transaksi_tipeuser_field == "C"){
+                            temp_client_withdraw_step = 1;
+                        }
+                    }else{
+                        temp_client_withdraw_step = 0;
                     }
                 }
-                msgloader = json.message;
+                
                 RefreshHalaman()
                 myModal_newentry.hide();
             } else if(json.status == 403){
@@ -437,10 +465,9 @@
             });
             const json = await res.json();
             if (json.status == 200) {
-                flag_btnsave = true;
-                
+                flag_btnsave = false;
                 msgloader = json.message;
-                myModal_newentry.hide();
+               
                 RefreshHalaman()
             } else if(json.status == 403){
                 flag_btnsave = true;
@@ -965,6 +992,12 @@
                         button_function="SAVE"
                         button_title="Save"
                         button_css="btn-warning"/>
+                    <Button on:click={() => {
+                            handleUpdateTransaksi("REJECTED");
+                        }} 
+                        button_function="SAVE"
+                        button_title="Rejected"
+                        button_css="btn-danger"/>
                 {/if}
             {:else}
                 {#if flag_btnsave}

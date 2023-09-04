@@ -17,6 +17,13 @@ type responsemember struct {
 	Listbank interface{} `json:"listbank"`
 	Record   interface{} `json:"record"`
 }
+type responsemembercredit struct {
+	Status        int     `json:"status"`
+	Message       string  `json:"message"`
+	Member_id     string  `json:"member_id"`
+	Member_name   string  `json:"member_name"`
+	Member_credit float64 `json:"member_credit"`
+}
 
 func Memberhome(c *fiber.Ctx) error {
 	hostname := c.Hostname()
@@ -129,6 +136,71 @@ func Membersearch(c *fiber.Ctx) error {
 			"record":   result.Record,
 			"listbank": result.Listbank,
 			"time":     time.Since(render_page).String(),
+		})
+	} else {
+		result_error := resp.Error().(*responseerror)
+		return c.JSON(fiber.Map{
+			"status":  result_error.Status,
+			"message": result_error.Message,
+			"time":    time.Since(render_page).String(),
+		})
+	}
+}
+func Membercredit(c *fiber.Ctx) error {
+	type payload_membercredit struct {
+		Page     string `json:"page"`
+		Sdata    string `json:"sdata" `
+		Idmember string `json:"idmember" `
+	}
+	hostname := c.Hostname()
+	bearToken := c.Get("Authorization")
+	token := strings.Split(bearToken, " ")
+	client := new(payload_membercredit)
+	if err := c.BodyParser(client); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+			"record":  nil,
+		})
+	}
+
+	log.Println("Hostname: ", hostname)
+	render_page := time.Now()
+	axios := resty.New()
+	resp, err := axios.R().
+		SetResult(responsemembercredit{}).
+		SetAuthToken(token[1]).
+		SetError(responseerror{}).
+		SetHeader("Content-Type", "application/json").
+		SetBody(map[string]interface{}{
+			"client_hostname": hostname,
+			"page":            client.Page,
+			"sdata":           client.Sdata,
+			"idmember":        client.Idmember,
+		}).
+		Post(PATH + "api/membercredit")
+	if err != nil {
+		log.Println(err.Error())
+	}
+	fmt.Println("Response Info:")
+	fmt.Println("  Error      :", err)
+	fmt.Println("  Status Code:", resp.StatusCode())
+	fmt.Println("  Status     :", resp.Status())
+	fmt.Println("  Proto      :", resp.Proto())
+	fmt.Println("  Time       :", resp.Time())
+	fmt.Println("  Received At:", resp.ReceivedAt())
+	fmt.Println("  Body       :\n", resp)
+	fmt.Println()
+	result := resp.Result().(*responsemembercredit)
+	if result.Status == 200 {
+		return c.JSON(fiber.Map{
+			"status":        result.Status,
+			"message":       result.Message,
+			"member_id":     result.Member_id,
+			"member_name":   result.Member_name,
+			"member_credit": result.Member_credit,
+			"time":          time.Since(render_page).String(),
 		})
 	} else {
 		result_error := resp.Error().(*responseerror)
